@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Costo Invisible de Navegar | Gente Saludable</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js para interactividad -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <!-- AOS para animaciones -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Open Sans', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        gs: {
+                            blue: '#0F2C59',      // Azul naviero profundo
+                            light: '#E8F1F5',     // Fondo claro
+                            accent: '#1E56A0',    // Azul acento
+                        },
+                        danger: {
+                            DEFAULT: '#DC2626',   // Rojo estrictamente para riesgos/pérdidas
+                            light: '#FEE2E2',
+                            dark: '#991B1B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Open Sans', sans-serif; background-color: #f8fafc; color: #333; }
+        h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #E8F1F5; }
+        ::-webkit-scrollbar-thumb { background: #0F2C59; border-radius: 4px; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px 0 rgba(15, 44, 89, 0.1);
+        }
+
+        .hero-bg {
+            background: linear-gradient(rgba(15, 44, 89, 0.85), rgba(15, 44, 89, 0.95)), url('https://images.unsplash.com/photo-1542385262-cdf06b302c2e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover fixed;
+        }
+
+        /* Iceberg CSS */
+        .iceberg-container { position: relative; width: 100%; height: 500px; display: flex; flex-direction: column; }
+        .iceberg-top { background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%); flex: 1; display: flex; align-items: center; justify-content: center; clip-path: polygon(20% 100%, 50% 0, 80% 100%); transition: all 0.5s ease; z-index: 2; border-bottom: 2px solid #0284c7;}
+        .iceberg-water-line { height: 4px; background-color: #0369a1; width: 100%; z-index: 3; box-shadow: 0 0 10px rgba(3,105,161,0.5); }
+        .iceberg-bottom { background: linear-gradient(180deg, #0284c7 0%, #0f172a 100%); flex: 2; display: flex; align-items: center; justify-content: center; clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%); opacity: 0.1; filter: blur(5px); transition: all 0.8s ease; }
+        .iceberg-container:hover .iceberg-bottom, .show-iceberg .iceberg-bottom { opacity: 1; filter: blur(0); }
+        .iceberg-container:hover .iceberg-top, .show-iceberg .iceberg-top { transform: translateY(-10px); }
+
+        /* Neural Network CSS */
+        .neural-node { transition: all 0.3s ease; cursor: pointer; }
+        .neural-node:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .active-node { border-color: #0F2C59; background-color: #E8F1F5; }
+        .loss-node { border-color: #DC2626; background-color: #FEE2E2; color: #991B1B; }
+    </style>
+</head>
+<body class="antialiased selection:bg-gs-accent selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300 glass-panel border-b border-gray-200" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <span class="text-2xl font-heading font-extrabold text-gs-blue tracking-tight">GENTE<span class="text-gs-accent font-light">SALUDABLE</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8 font-semibold text-sm text-gs-blue">
+                    <a href="#riesgos" class="hover:text-danger transition">Riesgos Financieros</a>
+                    <a href="#iceberg" class="hover:text-gs-accent transition">El Iceberg</a>
+                    <a href="#mapa" class="hover:text-gs-accent transition">Mapa Clínico</a>
+                    <a href="#soluciones" class="bg-gs-blue text-white px-5 py-2 rounded-full hover:bg-gs-accent transition shadow-lg">Programa de Blindaje</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PORTADA: Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right" data-aos-duration="1000">
+                    <div class="inline-block bg-danger text-white px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-6 shadow-lg shadow-danger/30">
+                        Webinar Ejecutivo | Alta Dirección
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white leading-tight mb-6">
+                        El costo <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-danger">invisible</span> de navegar.
+                    </h1>
+                    <p class="text-xl text-gray-300 mb-8 font-light leading-relaxed">
+                        Cómo la salud mental de la tripulación impacta directamente en la seguridad, productividad y <strong class="text-white font-semibold">rentabilidad neta</strong> de la flota en la Hidrovía.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#riesgos" class="text-center bg-danger text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:bg-danger-dark transition-all transform hover:-translate-y-1">
+                            Ver Pérdidas Económicas <i class="fas fa-arrow-down ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden lg:block" data-aos="fade-left" data-aos-duration="1200">
+                    <div class="glass-panel p-8 rounded-2xl relative">
+                        <div class="absolute -top-4 -right-4 bg-danger text-white w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl shadow-xl z-20">
+                            ROI
+                        </div>
+                        <h3 class="text-2xl font-heading font-bold text-gs-blue mb-4">Para Tomadores de Decisión:</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center text-gray-700"><i class="fas fa-check-circle text-gs-accent mr-3 text-xl"></i> Departamentos de Recursos Humanos</li>
+                            <li class="flex items-center text-gray-700"><i class="fas fa-check-circle text-gs-accent mr-3 text-xl"></i> Médicos Laboralistas Ocupacionales</li>
+                            <li class="flex items-center text-gray-700"><i class="fas fa-check-circle text-gs-accent mr-3 text-xl"></i> Gerencias de Seguridad Industrial (HSE)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 1: LA PREGUNTA INCÓMODA -->
+    <section id="riesgos" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-heading font-bold text-gs-blue mb-4">¿Cuánto dinero está perdiendo su empresa <span class="text-danger">sin saberlo?</span></h2>
+                <p class="text-lg text-gray-600">No hablamos de bienestar abstracto. Hablamos de fugas de capital comprobables. Este es el Top 10 de pérdidas operativas en el sector naviero:</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-data="{ activeRisk: null }">
+                
+                <!-- Riesgo 1 -->
+                <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition border-l-4 border-l-danger" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-danger-light text-danger-dark p-3 rounded-lg"><i class="fas fa-user-slash fa-lg"></i></div>
+                        <span class="text-danger font-bold text-sm bg-red-50 px-2 py-1 rounded">#1 Frecuencia</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gs-blue mb-2">Presentismo Negativo</h3>
+                    <p class="text-sm text-gray-600 mb-4">El tripulante está a bordo, pero cognitivamente desconectado por estrés o problemas personales.</p>
+                    <div class="bg-gray-50 p-3 rounded text-sm border border-gray-200">
+                        <span class="font-bold text-danger block mb-1">Impacto: USD 200 - 400 diarios</span>
+                        Rinde 30% menos, costando 3 veces más que el ausentismo tradicional.
+                    </div>
+                </div>
+
+                <!-- Riesgo 2 -->
+                <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition border-l-4 border-l-danger" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-danger-light text-danger-dark p-3 rounded-lg"><i class="fas fa-ship fa-lg"></i></div>
+                        <span class="text-danger font-bold text-sm bg-red-50 px-2 py-1 rounded">Riesgo Crítico</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gs-blue mb-2">Errores por Fatiga</h3>
+                    <p class="text-sm text-gray-600 mb-4">Microsueños en el puente de mando o mala manipulación de cabos por insomnio crónico.</p>
+                    <div class="bg-gray-50 p-3 rounded text-sm border border-gray-200">
+                        <span class="font-bold text-danger block mb-1">Impacto: USD 50k - >1 Millón</span>
+                        Varaduras, abordajes, lesiones corporales graves y daños estructurales.
+                    </div>
+                </div>
+
+                <!-- Riesgo 3 -->
+                <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition border-l-4 border-l-danger" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-danger-light text-danger-dark p-3 rounded-lg"><i class="fas fa-door-open fa-lg"></i></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gs-blue mb-2">Fuga de Talento Clave</h3>
+                    <p class="text-sm text-gray-600 mb-4">Renuncia de capitanes u oficiales calificados debido al Burnout y desgaste acumulado.</p>
+                    <div class="bg-gray-50 p-3 rounded text-sm border border-gray-200">
+                        <span class="font-bold text-danger block mb-1">Impacto: 150% - 200% del Salario</span>
+                        Altos costos de headhunting, inducción y pérdida de experticia fluvial.
+                    </div>
+                </div>
+
+                <!-- Otros riesgos resumidos para espacio -->
+                <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-md hover:shadow-lg transition" data-aos="fade-up">
+                    <h3 class="text-lg font-bold text-gs-blue mb-2"><i class="fas fa-clock text-danger mr-2"></i> Ausentismo y Horas Extra</h3>
+                    <p class="text-sm text-gray-600">Bajas imprevistas por crisis de ansiedad obligan a pagar dobles turnos.</p>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-md hover:shadow-lg transition" data-aos="fade-up">
+                    <h3 class="text-lg font-bold text-gs-blue mb-2"><i class="fas fa-anchor text-danger mr-2"></i> Lentitud y Demurrage</h3>
+                    <p class="text-sm text-gray-600">Equipos desmotivados retrasan carga/descarga generando multas en puertos.</p>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-md hover:shadow-lg transition" data-aos="fade-up">
+                    <h3 class="text-lg font-bold text-gs-blue mb-2"><i class="fas fa-heartbeat text-danger mr-2"></i> Alza en Primas Médicas</h3>
+                    <p class="text-sm text-gray-600">Somatización (gastritis, hipertensión) dispara siniestralidad del seguro corporativo.</p>
+                </div>
+
+            </div>
+
+            <div class="mt-12 text-center p-6 bg-red-50 rounded-xl border border-red-100" data-aos="zoom-in">
+                <p class="text-xl font-bold text-danger mb-2">"Estas pérdidas ya están ocurriendo, aunque todavía no se estén midiendo."</p>
+                <div class="text-xs text-gray-500 text-left mt-4 max-w-4xl mx-auto space-y-1">
+                    <p><i class="fas fa-book mr-1"></i> Organización Mundial de la Salud y Organización Internacional del Trabajo. (2022). Mental health at work: Policy brief.</p>
+                    <p><i class="fas fa-book mr-1"></i> Ruiz-Frutos, C., Delclós, J., Ronda, E., García, A. M., y Benavides, F. G. (2014). Salud laboral: Conceptos y técnicas para la prevención de riesgos laborales. Elsevier.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: EL ICEBERG -->
+    <section id="iceberg" class="py-24 bg-gs-light overflow-hidden" x-data="{ revealed: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div data-aos="fade-right">
+                    <h2 class="text-3xl md:text-4xl font-heading font-bold text-gs-blue mb-6">El Paradigma del Iceberg</h2>
+                    <p class="text-lg text-gray-700 mb-6">La mayoría de las empresas interviene cuando el problema ya emergió en forma de accidente, multa o renuncia. Eso es gestionar la consecuencia, no el riesgo.</p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <span class="bg-danger text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-1 flex-shrink-0"><i class="fas fa-eye text-xs"></i></span>
+                            <div>
+                                <strong class="text-danger block">Lo Visible (El Costo Directo)</strong>
+                                <span class="text-sm text-gray-600">Accidentes, Licencias Médicas, Conflictos Sindicales, Renuncias, Errores Operativos.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-gs-blue text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-1 flex-shrink-0"><i class="fas fa-eye-slash text-xs"></i></span>
+                            <div>
+                                <strong class="text-gs-blue block">Lo Invisible (La Causa Raíz)</strong>
+                                <span class="text-sm text-gray-600">Estrés crónico, Insomnio en el camarote, Agotamiento (Burnout), Desarraigo familiar, Irritabilidad contenida.</span>
+                            </div>
+                        </li>
+                    </ul>
+                    <button @click="revealed = !revealed" class="bg-gs-blue text-white px-6 py-3 rounded-lg font-bold hover:bg-gs-accent transition shadow-lg w-full sm:w-auto">
+                        <span x-text="revealed ? 'Ocultar Causa Raíz' : 'Revelar lo Invisible'"></span>
+                    </button>
+                </div>
+
+                <!-- Iceberg Visual -->
+                <div class="relative" data-aos="fade-left">
+                    <div class="iceberg-container rounded-2xl overflow-hidden shadow-2xl bg-sky-50" :class="{ 'show-iceberg': revealed }">
+                        <div class="iceberg-top relative">
+                            <div class="absolute inset-0 flex items-center justify-center flex-col text-center p-4">
+                                <span class="text-danger font-bold text-xl tracking-wider mb-2">LO VISIBLE</span>
+                                <span class="text-sky-900 font-semibold bg-white/80 px-3 py-1 rounded mb-1 text-sm shadow">Accidentes</span>
+                                <span class="text-sky-900 font-semibold bg-white/80 px-3 py-1 rounded mb-1 text-sm shadow">Ausentismo</span>
+                            </div>
+                        </div>
+                        <div class="iceberg-water-line relative flex items-center justify-center">
+                            <span class="absolute right-4 text-white text-xs font-bold bg-gs-blue px-2 py-1 rounded">Nivel de Superficie (Gestión de RRHH)</span>
+                        </div>
+                        <div class="iceberg-bottom relative">
+                            <div class="absolute inset-0 flex items-center justify-center flex-col text-center p-8 text-white opacity-0 transition-opacity duration-700" :class="{ 'opacity-100': revealed }">
+                                <span class="text-white/80 font-bold text-xl tracking-wider mb-4 border-b border-white/30 pb-2">LA RAÍZ DEL PROBLEMA</span>
+                                <div class="grid grid-cols-2 gap-4 text-sm font-semibold">
+                                    <span>Estrés Crónico</span>
+                                    <span>Aislamiento</span>
+                                    <span>Fatiga Fluvial</span>
+                                    <span>Miedo/Ansiedad</span>
+                                    <span>Burnout</span>
+                                    <span>Ira Reprimida</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: QUÉ LE OCURRE AL TRIPULANTE -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-gs-accent font-bold tracking-widest text-sm uppercase mb-2 block">Contexto de la Hidrovía</span>
+                <h2 class="text-3xl md:text-4xl font-heading font-bold text-gs-blue mb-4">La Olla a Presión del Tripulante</h2>
+                <p class="text-lg text-gray-600">Confinamiento, guardias prolongadas, separación familiar y alertas constantes. El cuerpo lleva la cuenta de este estrés, manifestándose en cuatro dimensiones clínicas:</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Físicos -->
+                <div class="bg-gray-50 rounded-xl p-6 border-t-4 border-gs-blue hover:-translate-y-2 transition duration-300" data-aos="fade-up" data-aos-delay="0">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-gs-blue shadow mb-4"><i class="fas fa-heartbeat text-xl"></i></div>
+                    <h3 class="font-bold text-lg text-gs-blue mb-3">Síntomas Físicos</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>• Alteración crónica del sueño</li>
+                        <li>• Hipertensión reactiva</li>
+                        <li>• Trastornos gástricos (Úlceras)</li>
+                        <li>• Contracturas y somatización</li>
+                    </ul>
+                </div>
+                <!-- Emocionales -->
+                <div class="bg-gray-50 rounded-xl p-6 border-t-4 border-sky-500 hover:-translate-y-2 transition duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-sky-500 shadow mb-4"><i class="fas fa-brain text-xl"></i></div>
+                    <h3 class="font-bold text-lg text-gs-blue mb-3">Emocionales</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>• Ansiedad y sensación de asfixia</li>
+                        <li>• Apatía profunda (Burnout)</li>
+                        <li>• Desregulación de la ira</li>
+                        <li>• Pensamientos catastróficos</li>
+                    </ul>
+                </div>
+                <!-- Conductuales -->
+                <div class="bg-gray-50 rounded-xl p-6 border-t-4 border-orange-400 hover:-translate-y-2 transition duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-orange-400 shadow mb-4"><i class="fas fa-running text-xl"></i></div>
+                    <h3 class="font-bold text-lg text-gs-blue mb-3">Conductuales</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>• Modo "Piloto Automático"</li>
+                        <li>• Impulsividad destructiva</li>
+                        <li>• Atracones de comida (Evasión)</li>
+                        <li>• Lentitud psicomotriz</li>
+                    </ul>
+                </div>
+                <!-- Relacionales -->
+                <div class="bg-gray-50 rounded-xl p-6 border-t-4 border-danger hover:-translate-y-2 transition duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-danger shadow mb-4"><i class="fas fa-users text-xl"></i></div>
+                    <h3 class="font-bold text-lg text-gs-blue mb-3">Relacionales</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>• Aislamiento en el camarote</li>
+                        <li>• Fricción constante a bordo</li>
+                        <li>• Intolerancia a directrices</li>
+                        <li>• Desarraigo extremo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 4: EL MAPA DEL PROBLEMA (Red Neuronal Interactiva) -->
+    <section id="mapa" class="py-24 bg-gs-blue text-white" x-data="{ activeDiagnosis: 'burnout' }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-down">
+                <h2 class="text-3xl md:text-4xl font-heading font-bold mb-4">Red Neuronal de Riesgos</h2>
+                <p class="text-lg text-sky-200">Seleccione un diagnóstico matriz para visualizar el mecanismo cibernético que conecta el síntoma humano con la pérdida corporativa (Basado en el modelo estratégico).</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Diagnósticos (Centro de control) -->
+                <div class="w-full lg:w-1/3 space-y-3">
+                    <h3 class="text-xl font-bold text-sky-300 mb-4 border-b border-sky-700 pb-2">Diagnóstico Clínico Matriz</h3>
+                    
+                    <button @click="activeDiagnosis = 'burnout'" :class="activeDiagnosis === 'burnout' ? 'bg-white text-gs-blue border-l-4 border-danger font-bold shadow-lg transform scale-105' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-l-4 border-transparent'" class="w-full text-left p-4 rounded-r-lg transition-all duration-300 flex justify-between items-center">
+                        <span>Síndrome de Burnout</span>
+                        <i class="fas fa-chevron-right" x-show="activeDiagnosis === 'burnout'"></i>
+                    </button>
+                    
+                    <button @click="activeDiagnosis = 'sueno'" :class="activeDiagnosis === 'sueno' ? 'bg-white text-gs-blue border-l-4 border-danger font-bold shadow-lg transform scale-105' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-l-4 border-transparent'" class="w-full text-left p-4 rounded-r-lg transition-all duration-300 flex justify-between items-center">
+                        <span>Trastorno del Sueño Fluvial</span>
+                        <i class="fas fa-chevron-right" x-show="activeDiagnosis === 'sueno'"></i>
+                    </button>
+
+                    <button @click="activeDiagnosis = 'ansiedad'" :class="activeDiagnosis === 'ansiedad' ? 'bg-white text-gs-blue border-l-4 border-danger font-bold shadow-lg transform scale-105' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-l-4 border-transparent'" class="w-full text-left p-4 rounded-r-lg transition-all duration-300 flex justify-between items-center">
+                        <span>Ansiedad y Crisis de Pánico</span>
+                        <i class="fas fa-chevron-right" x-show="activeDiagnosis === 'ansiedad'"></i>
+                    </button>
+
+                    <button @click="activeDiagnosis = 'somatizado'" :class="activeDiagnosis === 'somatizado' ? 'bg-white text-gs-blue border-l-4 border-danger font-bold shadow-lg transform scale-105' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-l-4 border-transparent'" class="w-full text-left p-4 rounded-r-lg transition-all duration-300 flex justify-between items-center">
+                        <span>Estrés Crónico Somatizado</span>
+                        <i class="fas fa-chevron-right" x-show="activeDiagnosis === 'somatizado'"></i>
+                    </button>
+
+                    <button @click="activeDiagnosis = 'ira'" :class="activeDiagnosis === 'ira' ? 'bg-white text-gs-blue border-l-4 border-danger font-bold shadow-lg transform scale-105' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-l-4 border-transparent'" class="w-full text-left p-4 rounded-r-lg transition-all duration-300 flex justify-between items-center">
+                        <span>Desregulación de la Ira</span>
+                        <i class="fas fa-chevron-right" x-show="activeDiagnosis === 'ira'"></i>
+                    </button>
+                    
+                    <button @click="activeDiagnosis = 'alimentario'" :class="activeDiagnosis === 'alimentario' ? 'bg-white text-gs-blue border-l-4 border-danger font-bold shadow-lg transform scale-105' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-l-4 border-transparent'" class="w-full text-left p-4 rounded-r-lg transition-all duration-300 flex justify-between items-center">
+                        <span>Evasión Alimentaria (Bulimia/Vomiting)</span>
+                        <i class="fas fa-chevron-right" x-show="activeDiagnosis === 'alimentario'"></i>
+                    </button>
+                </div>
+
+                <!-- Display Area -->
+                <div class="w-full lg:w-2/3 bg-slate-800 rounded-2xl p-6 lg:p-8 relative overflow-hidden border border-slate-700 shadow-2xl">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl"><i class="fas fa-project-diagram"></i></div>
+                    
+                    <!-- Content Burnout -->
+                    <div x-show="activeDiagnosis === 'burnout'" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" class="h-full flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/2">
+                                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-wider"><i class="fas fa-stethoscope mr-2"></i>Síntomas (Input)</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Fatiga profunda que no cede al descansar.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Cinismo y apatía ("brazos caídos").</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Sentimiento crónico de ineficacia.</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center justify-center hidden md:flex text-sky-500"><i class="fas fa-arrow-right fa-2x"></i></div>
+                            <div class="md:w-1/2">
+                                <h4 class="text-danger font-bold mb-2 uppercase text-xs tracking-wider"><i class="fas fa-dollar-sign mr-2"></i>Pérdida Financiera (Output)</h4>
+                                <div class="bg-danger/20 border border-danger p-4 rounded-lg">
+                                    <strong class="text-red-300 block mb-1">Rotación de Talentos Clave</strong>
+                                    <p class="text-sm">Oficiales que renuncian. Reemplazarlos cuesta entre 150% y 200% de su salario anual en inducción y curva de aprendizaje.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 italic">"El trabajador se desconecta mentalmente de la naviera; el sabotaje silencioso frena los procesos." (Moreno & Garrosa, 2011).</p>
+                    </div>
+
+                    <!-- Content Sueño -->
+                    <div x-show="activeDiagnosis === 'sueno'" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;" class="h-full flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/2">
+                                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-wider"><i class="fas fa-stethoscope mr-2"></i>Síntomas (Input)</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Microsueños involuntarios (ojos abiertos).</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Déficit severo de atención y reflejos.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Alteración del ritmo circadiano.</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center justify-center hidden md:flex text-sky-500"><i class="fas fa-arrow-right fa-2x"></i></div>
+                            <div class="md:w-1/2">
+                                <h4 class="text-danger font-bold mb-2 uppercase text-xs tracking-wider"><i class="fas fa-dollar-sign mr-2"></i>Pérdida Financiera (Output)</h4>
+                                <div class="bg-danger/20 border border-danger p-4 rounded-lg">
+                                    <strong class="text-red-300 block mb-1">Accidentes y Fallas Críticas</strong>
+                                    <p class="text-sm">Un microsueño en el timón provoca varaduras o colisiones. Riesgos evaluados en cientos de miles de dólares.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 italic">"La pérdida del sueño reparador equivale a operar bajo efectos de intoxicación etílica leve."</p>
+                    </div>
+
+                    <!-- Repeat for others... -->
+                    <!-- Content Ansiedad -->
+                    <div x-show="activeDiagnosis === 'ansiedad'" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;" class="h-full flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/2">
+                                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-wider">Síntomas (Input)</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Taquicardia y opresión en el pecho.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Miedo inminente a perder el control.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Bloqueo mental ante órdenes.</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center justify-center hidden md:flex text-sky-500"><i class="fas fa-arrow-right fa-2x"></i></div>
+                            <div class="md:w-1/2">
+                                <h4 class="text-danger font-bold mb-2 uppercase text-xs tracking-wider">Pérdida Financiera (Output)</h4>
+                                <div class="bg-danger/20 border border-danger p-4 rounded-lg">
+                                    <strong class="text-red-300 block mb-1">Ausentismo de Último Minuto</strong>
+                                    <p class="text-sm">Desembarcos forzosos o personal que no asiste al puerto, generando recargos del 100% en pago de horas extra a reemplazos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 italic">"El colapso del sistema de alerta genera bajas imprevistas inmanejables para operaciones."</p>
+                    </div>
+
+                    <!-- Content Somatizado -->
+                    <div x-show="activeDiagnosis === 'somatizado'" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;" class="h-full flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/2">
+                                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-wider">Síntomas (Input)</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Hipertensión reactiva (Picos de presión).</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Gastritis crónica / Úlceras.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Operación en Piloto Automático.</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center justify-center hidden md:flex text-sky-500"><i class="fas fa-arrow-right fa-2x"></i></div>
+                            <div class="md:w-1/2">
+                                <h4 class="text-danger font-bold mb-2 uppercase text-xs tracking-wider">Pérdida Financiera (Output)</h4>
+                                <div class="bg-danger/20 border border-danger p-4 rounded-lg">
+                                    <strong class="text-red-300 block mb-1">Aumento de Primas Médicas (Siniestralidad)</strong>
+                                    <p class="text-sm">Consultas médicas constantes por dolores físicos (origen psicosomático) que encarecen el seguro corporativo de la naviera.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 italic">"El estrés no tratado somatiza; el cuerpo lleva la cuenta y colapsa el sistema médico privado." (Van der Kolk, 2015).</p>
+                    </div>
+
+                    <!-- Content Ira -->
+                    <div x-show="activeDiagnosis === 'ira'" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;" class="h-full flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/2">
+                                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-wider">Síntomas (Input)</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Intolerancia a la crítica u órdenes.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Descargas de adrenalina y agresividad.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Interpretación paranoide del entorno.</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center justify-center hidden md:flex text-sky-500"><i class="fas fa-arrow-right fa-2x"></i></div>
+                            <div class="md:w-1/2">
+                                <h4 class="text-danger font-bold mb-2 uppercase text-xs tracking-wider">Pérdida Financiera (Output)</h4>
+                                <div class="bg-danger/20 border border-danger p-4 rounded-lg">
+                                    <strong class="text-red-300 block mb-1">Clima Tóxico y Demandas Laborales</strong>
+                                    <p class="text-sm">Conflictos a bordo que retrasan maniobras, daños a equipos por brusquedad y riesgo de demandas por violencia laboral o acoso.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 italic">"El efecto olla a presión del confinamiento destruye la comunicación de la cadena de mando."</p>
+                    </div>
+
+                     <!-- Content Alimentario -->
+                     <div x-show="activeDiagnosis === 'alimentario'" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;" class="h-full flex flex-col justify-center">
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/2">
+                                <h4 class="text-sky-400 font-bold mb-2 uppercase text-xs tracking-wider">Síntomas Metabólicos</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Atracones en aislamiento / Hipoglucemia reactiva.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Desórdenes de potasio y debilidad extrema.</li>
+                                    <li class="bg-slate-700 px-3 py-2 rounded">Uso de la "gordura" como coraza relacional.</li>
+                                </ul>
+                            </div>
+                            <div class="flex items-center justify-center hidden md:flex text-sky-500"><i class="fas fa-arrow-right fa-2x"></i></div>
+                            <div class="md:w-1/2">
+                                <h4 class="text-danger font-bold mb-2 uppercase text-xs tracking-wider">Pérdida Financiera (Output)</h4>
+                                <div class="bg-danger/20 border border-danger p-4 rounded-lg">
+                                    <strong class="text-red-300 block mb-1">Mal Juicio Operativo en Crisis</strong>
+                                    <p class="text-sm">La hipoglucemia nubla la corteza prefrontal en plena tormenta o bajante crítica, causando errores de decisión que comprometen el convoy completo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-400 italic">"El descontrol alimentario oculto a bordo genera déficits metabólicos letales para la seguridad náutica." (Nardone, 2002).</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 5: QUÉ PASA SI NO HACEMOS NADA -->
+    <section class="py-24 bg-red-50 border-t border-b border-red-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12" data-aos="fade-up">
+                <h2 class="text-3xl font-heading font-bold text-danger-dark mb-4">¿Qué pasa si la empresa decide "esperar y ver"?</h2>
+                <p class="text-gray-700 text-lg">La inacción no congela el problema, permite que se multiplique en cascada.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="0">
+                    <i class="fas fa-exclamation-triangle text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Más Errores Humanos</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="50">
+                    <i class="fas fa-car-crash text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Más Accidentes</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="100">
+                    <i class="fas fa-user-minus text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Más Rotación</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="150">
+                    <i class="fas fa-file-medical text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Más Licencias</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="200">
+                    <i class="fas fa-money-bill-wave text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Más Costos Médicos</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="250">
+                    <i class="fas fa-chart-line text-3xl text-danger mb-3 flex items-center justify-center transform rotate-180 scale-x-[-1]"></i>
+                    <h4 class="font-bold text-gray-800">Menor Productividad</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="300">
+                    <i class="fas fa-users-slash text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Menor Compromiso</h4>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-red-100" data-aos="zoom-in" data-aos-delay="350">
+                    <i class="fas fa-fist-raised text-3xl text-danger mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Más Conflictos</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 6: LA SOLUCIÓN (Servicios Gente Saludable) -->
+    <section id="soluciones" class="py-24 bg-white relative overflow-hidden">
+        <!-- Decoración de fondo -->
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-gs-light opacity-50 z-0"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-gs-accent font-bold tracking-widest text-sm uppercase mb-2 block">Intervención de Contención</span>
+                <h2 class="text-3xl md:text-4xl font-heading font-bold text-gs-blue mb-4">Soluciones Preventivas Integrales</h2>
+                <p class="text-lg text-gray-600">Nuestro programa transforma el riesgo psicosocial en blindaje operativo. Cuatro líneas de acción diseñadas para el entorno marítimo e industrial:</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- A. Terapia -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition" data-aos="fade-right">
+                    <div class="w-14 h-14 bg-gs-blue text-white rounded-xl flex items-center justify-center text-2xl mb-6 shadow-md"><i class="fas fa-user-md"></i></div>
+                    <h3 class="text-2xl font-bold text-gs-blue mb-3">A. Atención Psicológica Especializada</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Basada en <strong>Terapia Breve Estratégica</strong> (focalizada y de alta eficiencia).</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Intervenciones para el tripulante y su familia.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Resolución rápida de bloqueos emocionales antes de que escalen a bajas.</li>
+                    </ul>
+                </div>
+
+                <!-- B. PAP -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition" data-aos="fade-left">
+                    <div class="w-14 h-14 bg-gs-accent text-white rounded-xl flex items-center justify-center text-2xl mb-6 shadow-md"><i class="fas fa-hands-helping"></i></div>
+                    <h3 class="text-2xl font-bold text-gs-blue mb-3">B. Primeros Auxilios Psicológicos (PAP)</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Contención temprana ante emergencias navieras o personales.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Reducción drástica del escalamiento de crisis.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Estabilización del personal para toma de decisiones segura.</li>
+                    </ul>
+                </div>
+
+                <!-- C. Guardia 24/7 -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition relative overflow-hidden" data-aos="fade-right">
+                    <div class="absolute top-0 right-0 bg-danger text-white text-xs font-bold px-3 py-1 rounded-bl-lg">PREMIUM</div>
+                    <div class="w-14 h-14 bg-gs-blue text-white rounded-xl flex items-center justify-center text-2xl mb-6 shadow-md"><i class="fas fa-phone-volume"></i></div>
+                    <h3 class="text-2xl font-bold text-gs-blue mb-3">C. Línea de Guardia Clínica 24/7</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Conexión inmediata entre embarcación y nuestra central clínica en tierra.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Operado 100% por psicólogos expertos en crisis y trauma.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Disponibilidad absoluta 365 días al año, para tripulantes en río.</li>
+                    </ul>
+                </div>
+
+                <!-- D. Charlas -->
+                <div class="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition" data-aos="fade-left">
+                    <div class="w-14 h-14 bg-gs-accent text-white rounded-xl flex items-center justify-center text-2xl mb-6 shadow-md"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h3 class="text-2xl font-bold text-gs-blue mb-3">D. Charlas Especializadas</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Talleres adaptados a las necesidades reales del comité de seguridad.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Capacitación a mandos medios en gestión de fatiga y sueño.</li>
+                        <li><i class="fas fa-check text-gs-accent mr-2"></i> Herramientas de comunicación para espacios confinados.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 7 y 8: GARANTÍA ÉTICA Y BENEFICIOS -->
+    <section class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                
+                <!-- Garantía -->
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200" data-aos="fade-up">
+                    <div class="flex items-center mb-6">
+                        <i class="fas fa-shield-alt text-4xl text-gs-blue mr-4"></i>
+                        <h2 class="text-2xl font-bold text-gs-blue">Garantía Ética y Confidencialidad</h2>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-times-circle text-danger mt-1 mr-3"></i>
+                            <p class="text-gray-700"><strong>NO</strong> es una auditoría psicológica del personal.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-times-circle text-danger mt-1 mr-3"></i>
+                            <p class="text-gray-700"><strong>NO</strong> se realizan evaluaciones de rendimiento operativo.</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-times-circle text-danger mt-1 mr-3"></i>
+                            <p class="text-gray-700"><strong>NO</strong> se generan informes de desvinculación ni compartimos datos clínicos individuales.</p>
+                        </div>
+                        <div class="mt-6 p-4 bg-gs-light rounded-lg border-l-4 border-gs-blue flex items-start">
+                            <i class="fas fa-info-circle text-gs-blue mt-1 mr-3"></i>
+                            <p class="text-sm text-gray-700">El espacio terapéutico está estrictamente protegido. <strong>RR.HH. y Seguridad reciben únicamente indicadores globales, anónimos y estadísticos</strong> para medir el ROI del programa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beneficio Adicional -->
+                <div class="bg-gs-blue text-white p-8 rounded-2xl shadow-xl relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-gift absolute -top-4 -right-4 text-8xl text-white opacity-10"></i>
+                    <h2 class="text-2xl font-bold mb-6 text-sky-200">Beneficio Adicional Exclusivo</h2>
+                    <p class="mb-6 font-light text-lg">La contratación de cualquiera de nuestros servicios incluye, <strong>sin costo adicional</strong>, una Charla de Socialización On-Board o en Base.</p>
+                    
+                    <h4 class="font-bold mb-3 uppercase tracking-wider text-sm border-b border-sky-600 pb-2">Objetivos de la Socialización:</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-sky-400 mr-3"></i> Explicar la confidencialidad absoluta al tripulante.</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-sky-400 mr-3"></i> Reducir la resistencia cultural (el "ñembotavy") al servicio.</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-sky-400 mr-3"></i> Presentar el programa como un beneficio corporativo premium.</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-sky-400 mr-3"></i> Aumentar la adherencia temprana (prevención).</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN FINAL: RESUMEN Y CTA -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <h2 class="text-3xl font-heading font-bold text-gs-blue mb-12">Resumen Ejecutivo</h2>
+            
+            <!-- Flow -->
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-16" data-aos="zoom-in">
+                <div class="bg-gray-100 p-4 rounded-lg w-full md:w-48 shadow-sm">
+                    <strong class="block text-gs-blue">El Problema</strong>
+                    <span class="text-xs text-gray-500">Riesgo Psicosocial</span>
+                </div>
+                <i class="fas fa-arrow-right text-gray-300 hidden md:block"></i>
+                <i class="fas fa-arrow-down text-gray-300 md:hidden"></i>
+                <div class="bg-red-50 p-4 rounded-lg w-full md:w-48 shadow-sm border border-red-100">
+                    <strong class="block text-danger">La Consecuencia</strong>
+                    <span class="text-xs text-danger-dark">Pérdida Económica y Riesgo Operativo</span>
+                </div>
+                <i class="fas fa-arrow-right text-gray-300 hidden md:block"></i>
+                <i class="fas fa-arrow-down text-gray-300 md:hidden"></i>
+                <div class="bg-sky-50 p-4 rounded-lg w-full md:w-48 shadow-sm border border-sky-100">
+                    <strong class="block text-gs-accent">La Solución</strong>
+                    <span class="text-xs text-sky-700">Blindaje y Contención Clínica G.S.</span>
+                </div>
+                <i class="fas fa-arrow-right text-gray-300 hidden md:block"></i>
+                <i class="fas fa-arrow-down text-gray-300 md:hidden"></i>
+                <div class="bg-green-50 p-4 rounded-lg w-full md:w-48 shadow-sm border border-green-200">
+                    <strong class="block text-green-700">El Beneficio</strong>
+                    <span class="text-xs text-green-800">Rentabilidad, Retención y Seguridad</span>
+                </div>
+            </div>
+
+            <div class="max-w-4xl mx-auto bg-gs-blue rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden" data-aos="fade-up">
+                <div class="absolute inset-0 bg-gradient-to-r from-gs-blue to-gs-accent opacity-90"></div>
+                <div class="relative z-10">
+                    <h2 class="text-3xl md:text-5xl font-heading font-bold mb-6">
+                        "Las personas protegidas trabajan mejor.<br>
+                        <span class="text-sky-300">Las operaciones seguras son más rentables."</span>
+                    </h2>
+                    <p class="text-lg text-sky-100 mb-10">Solicite una reunión comercial para evaluar la implementación del programa en su flota.</p>
+                    
+                    <div class="flex flex-col md:flex-row justify-center items-center gap-8 bg-white/10 p-6 rounded-2xl backdrop-blur-sm">
+                        <!-- QR Placeholder (Generado por CSS para Demo, reemplazar con img real) -->
+                        <div class="bg-white p-2 rounded-lg flex flex-col items-center">
+                            <div class="w-32 h-32 bg-gray-200 flex items-center justify-center text-gray-400 mb-2">
+                                <i class="fas fa-qrcode fa-4x"></i>
+                            </div>
+                            <span class="text-gs-blue font-bold text-xs">Escanear WhatsApp</span>
+                        </div>
+                        
+                        <div class="text-left space-y-4">
+                            <h3 class="font-bold text-2xl font-heading tracking-wider">GENTE<span class="font-light">SALUDABLE</span></h3>
+                            <a href="#" class="flex items-center text-sky-100 hover:text-white transition group">
+                                <i class="fab fa-whatsapp text-2xl mr-3 group-hover:scale-110 transition"></i>
+                                <span class="text-xl">+595 (XX) XXX-XXXX</span>
+                            </a>
+                            <a href="#" class="flex items-center text-sky-100 hover:text-white transition group">
+                                <i class="fas fa-envelope text-xl mr-3 group-hover:scale-110 transition"></i>
+                                <span>comercial@gentesaludable.com</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-500 py-8 text-center text-sm border-t border-slate-800">
+        <p>&copy; 2026 Gente Saludable - Asesoría Estratégica en Salud Ocupacional. Todos los derechos reservados.</p>
+        <p class="mt-2 text-xs">Basado en protocolos de Terapia Breve Estratégica y normativas internacionales de la OIT/OMS.</p>
+    </footer>
+
+    <!-- Init Scripts -->
+    <script>
+        // Init AOS animations
+        AOS.init({
+            once: true,
+            offset: 100,
+            duration: 800,
+        });
+
+        // Navbar blur effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-md');
+                nav.classList.replace('border-transparent', 'border-gray-200');
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.classList.replace('border-gray-200', 'border-transparent');
+            }
+        });
+    </script>
+</body>
+</html>
