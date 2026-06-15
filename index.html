@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Costo Invisible de Navegar — Gente Saludable</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+/* ============ VARIABLES ============ */
+:root {
+  --bg-pergamino:#F7F4EF; --bg-medio:#EAE2D6;
+  --text-principal:#2C2621; --azul-corp:#225792;
+  --verde-salud:#91BF2D; --gris-medio:#656565;
+  --terracota:#A04A3A; --blanco:#FFFFFF;
+  --sombra-card:rgba(34,87,146,0.13);
+  --font-display:'Montserrat',sans-serif;
+  --font-body:'Open Sans',sans-serif;
+  --radius:10px; --radius-lg:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:var(--font-body);background:#1a1a2e;}
+button{cursor:pointer;border:none;font-family:var(--font-display);}
+a{text-decoration:none;color:inherit;}
+sup.ref-link{font-size:0.6em;cursor:pointer;color:var(--azul-corp);font-weight:700;}
+sup.ref-link:hover{color:var(--verde-salud);}
+
+/* ============ CARRUSEL ============ */
+#presentation-wrapper{position:fixed;inset:0;overflow:hidden;}
+#slides-track{display:flex;width:1100vw;height:100vh;
+  transition:transform 0.5s ease-in-out;}
+.slide{width:100vw;height:100vh;flex-shrink:0;position:relative;
+  background:var(--bg-pergamino);overflow:hidden;}
+.slide-inner{width:100%;height:100%;display:flex;flex-direction:column;
+  padding:2.2rem 3.5rem 1.5rem;overflow:hidden;}
+
+/* ============ FLECHAS ============ */
+.nav-arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:200;
+  background:rgba(34,87,146,0.88);color:#fff;border:none;border-radius:50%;
+  width:52px;height:52px;font-size:1.4rem;display:flex;align-items:center;
+  justify-content:center;transition:all 0.2s;box-shadow:0 2px 14px rgba(0,0,0,0.25);}
+.nav-arrow:hover{background:var(--azul-corp);transform:translateY(-50%) scale(1.1);}
+.nav-arrow:disabled{opacity:0.2;cursor:not-allowed;pointer-events:none;}
+#prev-arrow{left:10px;}
+#next-arrow{right:10px;}
+
+/* ============ ÍNDICE FLOTANTE ============ */
+#index-btn{position:fixed;top:14px;right:14px;z-index:300;
+  background:var(--azul-corp);color:#fff;padding:0.5rem 1.1rem;
+  border-radius:8px;font-size:0.9rem;font-weight:700;
+  box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+#index-btn:hover{background:#1a4070;}
+/* Índice overlay — FUERA del slides-track, directo en body */
+#index-overlay{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.5);
+  display:none;align-items:center;justify-content:center;}
+#index-panel{background:rgba(34,87,146,0.97);backdrop-filter:blur(14px);
+  border-radius:var(--radius-lg);padding:2rem;min-width:340px;max-width:440px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.5);position:relative;}
+#index-panel h3{color:#fff;font-family:var(--font-display);font-size:1.1rem;
+  margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.2);}
+#index-close{position:absolute;top:10px;right:12px;background:transparent;
+  color:#fff;font-size:1.3rem;padding:2px 7px;}
+.index-item{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0.75rem;
+  border-radius:8px;cursor:pointer;color:#fff;font-size:0.92rem;transition:background 0.15s;}
+.index-item:hover{background:rgba(255,255,255,0.15);}
+.idx-num{font-family:var(--font-display);font-weight:900;color:var(--verde-salud);
+  min-width:28px;font-size:0.95rem;}
+
+/* ============ COMPONENTES ============ */
+.academic-card{background:var(--blanco);border-radius:var(--radius);
+  border-left:5px solid var(--azul-corp);padding:1.1rem 1.4rem;
+  box-shadow:0 4px 16px var(--sombra-card);}
+.slide-title{font-family:var(--font-display);font-weight:900;color:var(--azul-corp);
+  font-size:clamp(1.8rem,2.8vw,2.6rem);line-height:1.15;margin-bottom:0.2rem;}
+.slide-subtitle{font-family:var(--font-body);color:var(--gris-medio);
+  font-size:clamp(0.95rem,1.4vw,1.1rem);margin-bottom:0.9rem;line-height:1.4;}
+
+/* ============ SLIDE 01 — HERO ============ */
+#slide-01{background:linear-gradient(145deg,#0a1628 0%,#142d54 50%,#1a3a6e 100%);}
+#bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1;}
+#s01-overlay{position:absolute;inset:0;background:rgba(13,31,60,0.52);z-index:1;}
+#s01-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;
+  background:rgba(255,255,255,0.15);backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.3);border-radius:20px;
+  padding:2.2rem 3rem;text-align:center;max-width:700px;width:86%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#s01-logo{max-width:180px;margin:0 auto 1rem;display:block;}
+#s01-title{color:#fff;font-family:var(--font-display);font-weight:900;
+  font-size:clamp(1.4rem,2.8vw,2.6rem);line-height:1.2;margin-bottom:0.8rem;
+  word-break:normal;overflow-wrap:normal;white-space:normal;
+  hyphens:none;}
+#s01-subtitle{color:rgba(255,255,255,0.92);font-family:var(--font-body);
+  font-size:clamp(0.88rem,1.3vw,1.05rem);line-height:1.6;}
+#s01-subtitle .hl{color:#91BF2D;font-weight:700;}
+
+/* ============ SLIDE 02 — TOP 10 ============ */
+#slide-02 .slide-inner{padding:2rem 3rem 1.2rem;}
+.s02-header{flex-shrink:0;}
+.losses-grid{display:grid;grid-template-columns:repeat(5,1fr);
+  grid-template-rows:1fr 1fr;gap:0.7rem;flex:1;min-height:0;}
+.loss-card{background:var(--bg-medio);border-left:5px solid var(--azul-corp);
+  border-radius:var(--radius);padding:1rem 1.1rem;cursor:pointer;
+  display:flex;flex-direction:column;justify-content:center;
+  transition:box-shadow 0.2s,border-color 0.2s,transform 0.15s;}
+.loss-card:hover{box-shadow:0 6px 22px var(--sombra-card);
+  border-color:var(--verde-salud);transform:translateY(-3px);}
+.loss-num{font-family:var(--font-display);font-weight:900;
+  color:var(--azul-corp);font-size:clamp(1.8rem,2.5vw,2.4rem);line-height:1;}
+.loss-title-sm{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(0.78rem,1vw,0.92rem);color:var(--text-principal);
+  margin-top:0.35rem;line-height:1.3;}
+
+/* ============ MODAL (FIXED, FUERA DEL WRAPPER) ============ */
+#loss-modal-overlay{position:fixed;inset:0;z-index:5000;
+  background:rgba(0,0,0,0.78);display:none;
+  align-items:center;justify-content:center;}
+#loss-modal{background:var(--blanco);border-radius:var(--radius-lg);
+  width:min(700px,90vw);max-height:88vh;overflow:hidden;
+  box-shadow:0 20px 70px rgba(0,0,0,0.5);display:flex;flex-direction:column;}
+#lm-header{background:var(--azul-corp);color:#fff;padding:1.1rem 1.4rem;
+  display:flex;align-items:center;gap:0.8rem;flex-shrink:0;}
+#lm-num{font-family:var(--font-display);font-weight:900;font-size:2.2rem;
+  min-width:56px;text-align:center;background:rgba(255,255,255,0.15);
+  border-radius:8px;padding:0 0.6rem;line-height:1.2;}
+#lm-title{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(1rem,1.5vw,1.2rem);flex:1;line-height:1.3;}
+#lm-close{background:transparent;color:#fff;font-size:1.5rem;
+  padding:4px 9px;border-radius:6px;margin-left:auto;transition:background 0.15s;}
+#lm-close:hover{background:rgba(255,255,255,0.2);}
+#lm-body{padding:1.6rem;overflow-y:auto;flex:1;}
+#lm-desc{font-family:var(--font-body);font-size:clamp(0.95rem,1.2vw,1.05rem);
+  line-height:1.75;color:var(--text-principal);margin-bottom:1.2rem;}
+#lm-impact{background:rgba(160,74,58,0.08);border-left:5px solid var(--terracota);
+  padding:1rem 1.4rem;border-radius:8px;}
+#lm-impact .lbl{font-size:0.82rem;color:var(--gris-medio);margin-bottom:0.3rem;
+  font-family:var(--font-body);}
+#lm-impact .amt{color:var(--terracota);font-family:var(--font-display);
+  font-weight:700;font-size:clamp(1.3rem,2vw,1.6rem);}
+#lm-footer{padding:1rem 1.4rem;border-top:1px solid var(--bg-medio);
+  display:flex;justify-content:space-between;flex-shrink:0;}
+.lm-nav{background:var(--azul-corp);color:#fff;padding:0.55rem 1.3rem;
+  border-radius:8px;font-size:0.9rem;font-weight:700;transition:background 0.2s;}
+.lm-nav:hover{background:#1a4070;}
+.lm-nav:disabled{opacity:0.3;cursor:default;}
+
+/* ============ SLIDE 03 — ICEBERG ============ */
+#slide-03 .slide-inner{padding:1.6rem 3rem 1.2rem;}
+#s03-quote{font-style:italic;font-family:var(--font-display);font-weight:600;
+  color:var(--azul-corp);background:rgba(34,87,146,0.07);
+  border-left:4px solid var(--azul-corp);padding:0.65rem 1.1rem;
+  font-size:clamp(0.9rem,1.2vw,1rem);margin-bottom:0.8rem;border-radius:0 6px 6px 0;flex-shrink:0;}
+#s03-main{display:flex;gap:1.8rem;flex:1;min-height:0;}
+#s03-left{width:44%;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
+#iceberg-svg{width:100%;flex:1;min-height:0;max-height:calc(100vh - 220px);}
+#s03-toggle-btn{margin-top:0.7rem;background:var(--azul-corp);color:#fff;
+  padding:0.6rem 1.4rem;border-radius:8px;font-size:0.95rem;font-weight:700;
+  flex-shrink:0;transition:all 0.2s;}
+#s03-toggle-btn:hover{transform:scale(1.04);}
+#s03-right{width:56%;position:relative;overflow:hidden;}
+.s03-panel{position:absolute;inset:0;overflow:hidden;display:flex;flex-direction:column;}
+#s03-panel-a{opacity:1;}
+#s03-panel-b{opacity:0;pointer-events:none;}
+.s03-ptitle{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(1rem,1.4vw,1.15rem);padding-bottom:6px;
+  margin-bottom:6px;flex-shrink:0;}
+.s03-badge{display:inline-block;font-size:0.75rem;font-weight:700;
+  padding:3px 10px;border-radius:4px;margin-bottom:8px;flex-shrink:0;}
+.badge-r{background:rgba(160,74,58,0.14);color:var(--terracota);}
+.badge-p{background:rgba(145,191,45,0.14);color:#5a8000;}
+.s03-items{display:flex;flex-direction:column;gap:5px;flex:1;min-height:0;}
+.iceberg-item{display:flex;align-items:center;gap:0.55rem;
+  padding:0.42rem 0.7rem;border-radius:6px;
+  font-size:clamp(0.88rem,1.1vw,1rem);font-family:var(--font-body);flex-shrink:0;}
+.panel-visible .iceberg-item{background:rgba(34,87,146,0.06);}
+.panel-hidden .iceberg-item{background:rgba(26,58,92,0.07);}
+.iceberg-item .ico{min-width:1.4rem;}
+#s03-conclusion{margin-top:0.7rem;font-size:clamp(0.85rem,1.1vw,0.95rem);
+  line-height:1.6;opacity:0;flex-shrink:0;}
+
+/* ============ SLIDE 04 — CONTEXTO ============ */
+#slide-04 .slide-inner{padding:2rem 3.5rem 1.2rem;}
+.quads-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;flex:1;min-height:0;}
+.quad-card{background:var(--blanco);border-radius:var(--radius);
+  padding:1.1rem 1.2rem 1rem 1.5rem;box-shadow:0 4px 14px var(--sombra-card);
+  position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.quad-card::before{content:'';position:absolute;left:0;top:0;bottom:0;
+  width:5px;transition:width 0.2s;border-radius:4px 0 0 4px;}
+.quad-card:hover::before{width:9px;}
+.quad-card.q-f::before{background:var(--terracota);}
+.quad-card.q-e::before{background:var(--azul-corp);}
+.quad-card.q-c::before{background:var(--verde-salud);}
+.quad-card.q-r::before{background:var(--gris-medio);}
+.quad-header{display:flex;align-items:center;gap:0.55rem;margin-bottom:0.55rem;flex-shrink:0;}
+.quad-icon{font-size:1.5rem;}
+.quad-title{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(0.95rem,1.3vw,1.1rem);}
+.quad-list{list-style:none;flex:1;display:flex;flex-direction:column;justify-content:space-around;}
+.quad-list li{font-family:var(--font-body);font-size:clamp(0.88rem,1.1vw,1rem);
+  color:var(--text-principal);padding:0.22rem 0;
+  border-bottom:1px solid rgba(0,0,0,0.05);line-height:1.4;}
+.quad-list li:last-child{border-bottom:none;}
+
+/* ============ SLIDE 05 — MAPEO CLÍNICO ============ */
+#slide-05 .slide-inner{padding:1.8rem 2.5rem 1rem;}
+#s05-layout{display:flex;gap:1rem;flex:1;min-height:0;}
+#s05-col-left{width:21%;display:flex;flex-direction:column;gap:0.4rem;}
+.diag-btn{background:var(--bg-medio);color:var(--text-principal);
+  padding:0.6rem 0.75rem;border-radius:8px;text-align:left;border:none;cursor:pointer;
+  font-family:var(--font-display);font-weight:600;font-size:clamp(0.78rem,1vw,0.9rem);
+  border-left:3px solid transparent;transition:all 0.18s;flex:1;line-height:1.3;}
+.diag-btn:hover{background:#d5ccc0;border-color:var(--azul-corp);}
+.diag-btn.active{background:var(--azul-corp);color:#fff;border-color:var(--verde-salud);}
+#s05-col-center{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+#s05-sym-panel{background:var(--blanco);border-radius:var(--radius);padding:1rem;
+  box-shadow:0 2px 10px var(--sombra-card);flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.sym-placeholder{color:var(--gris-medio);font-size:1rem;text-align:center;
+  margin:auto;font-style:italic;}
+.sym-diag-title{font-family:var(--font-display);font-weight:900;color:var(--azul-corp);
+  font-size:clamp(0.95rem,1.3vw,1.1rem);margin-bottom:0.7rem;padding-bottom:0.4rem;
+  border-bottom:2px solid var(--azul-corp);flex-shrink:0;}
+.sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;flex:1;min-height:0;}
+.sym-card{border-radius:8px;border-left:4px solid;padding:0.65rem 0.8rem;
+  background:var(--bg-pergamino);overflow:hidden;display:flex;flex-direction:column;}
+.sym-card.f{border-color:var(--terracota);}
+.sym-card.e{border-color:var(--azul-corp);}
+.sym-card.c{border-color:var(--verde-salud);}
+.sym-card.r{border-color:var(--gris-medio);}
+.sym-card-title{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(0.75rem,1vw,0.88rem);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.04em;}
+.sym-card.f .sym-card-title{color:var(--terracota);}
+.sym-card.e .sym-card-title{color:var(--azul-corp);}
+.sym-card.c .sym-card-title{color:var(--verde-salud);}
+.sym-card.r .sym-card-title{color:var(--gris-medio);}
+.sym-card ul{list-style:none;flex:1;display:flex;flex-direction:column;justify-content:space-around;}
+.sym-card ul li{font-size:clamp(0.75rem,0.95vw,0.88rem);color:var(--text-principal);
+  line-height:1.4;padding:0.1rem 0;}
+.sym-card ul li::before{content:"• ";opacity:0.45;}
+#s05-col-right{width:27%;overflow:hidden;display:flex;flex-direction:column;}
+#s05-loss-panel{background:var(--blanco);border-radius:var(--radius);padding:0.75rem;
+  box-shadow:0 2px 10px var(--sombra-card);flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.loss-node-hdr{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(0.8rem,1vw,0.9rem);color:var(--azul-corp);
+  margin-bottom:0.45rem;padding-bottom:0.3rem;border-bottom:2px solid var(--azul-corp);flex-shrink:0;}
+.nodes-list{flex:1;display:flex;flex-direction:column;gap:0.28rem;min-height:0;}
+.loss-node{display:flex;align-items:center;gap:0.4rem;padding:0.35rem 0.5rem;
+  border-radius:6px;background:var(--bg-medio);border-left:3px solid transparent;
+  transition:all 0.3s;flex:1;}
+.loss-node .nn{font-family:var(--font-display);font-weight:900;
+  font-size:clamp(0.72rem,0.9vw,0.85rem);min-width:18px;color:var(--gris-medio);}
+.loss-node .nm{font-family:var(--font-body);font-size:clamp(0.72rem,0.9vw,0.85rem);
+  color:var(--text-principal);flex:1;line-height:1.2;}
+.loss-node .nb{font-size:0.68rem;font-weight:700;padding:1px 5px;border-radius:3px;
+  background:var(--terracota);color:#fff;opacity:0;transform:scale(0);transition:all 0.3s;}
+.loss-node.active{background:rgba(160,74,58,0.1);border-color:var(--terracota);}
+.loss-node.active .nn{color:var(--terracota);}
+.loss-node.active .nb{opacity:1;transform:scale(1);}
+.loss-node.dimmed{opacity:0.28;}
+
+/* ============ SLIDE 06 — DOMINÓ ============ */
+#slide-06 .slide-inner{padding:1.5rem 2.5rem 1rem;}
+.s06-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;}
+.s06-btns{display:flex;gap:0.6rem;align-items:center;flex-shrink:0;}
+#btn-start-dom,#btn-reset-dom{padding:0.5rem 1.1rem;border-radius:8px;
+  font-size:0.88rem;font-weight:700;transition:all 0.2s;}
+#btn-start-dom{background:var(--azul-corp);color:#fff;}
+#btn-start-dom:hover{background:#1a4070;}
+#btn-reset-dom{background:var(--bg-medio);color:var(--text-principal);display:none;}
+#btn-reset-dom:hover{background:#d5ccc0;}
+#s06-area{flex:1;display:flex;flex-direction:column;min-height:0;margin-top:0.6rem;gap:0;}
+#s06-tiles{display:flex;align-items:flex-end;gap:10px;justify-content:center;
+  height:150px;flex-shrink:0;padding-bottom:0;
+  position:relative;z-index:1;}
+#s06-panels{display:flex;gap:10px;justify-content:center;
+  flex:1;min-height:0;padding-top:4px;align-items:stretch;
+  position:relative;z-index:10;}
+.dom-wrap{display:flex;flex-direction:column;align-items:center;}
+.dom-ico{font-size:1rem;margin-bottom:3px;text-align:center;}
+.dom-tile{width:86px;height:138px;background:var(--azul-corp);border-radius:6px 6px 0 0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transform-origin:bottom center;box-shadow:0 4px 14px rgba(34,87,146,0.38);
+  border-bottom:5px solid var(--terracota);flex-shrink:0;
+  position:relative;z-index:1;}
+.dom-tile:first-child{cursor:pointer;}
+.dom-n{font-family:var(--font-display);font-weight:900;color:#fff;font-size:1.7rem;line-height:1;}
+.dom-lbl{font-family:var(--font-display);font-weight:600;color:rgba(255,255,255,0.88);
+  font-size:0.6rem;text-align:center;padding:0 5px;margin-top:4px;line-height:1.3;}
+.dom-panel{width:86px;background:var(--blanco);border-radius:0 0 8px 8px;
+  overflow:hidden;height:0;opacity:0;
+  border-left:4px solid var(--azul-corp);
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.dom-panel.is-final{background:var(--terracota);border-color:#8a3020;}
+.dp-in{padding:8px 9px;}
+.dp-sh{font-family:var(--font-display);font-weight:700;font-size:0.68rem;
+  color:var(--azul-corp);margin-bottom:5px;line-height:1.3;}
+.dom-panel.is-final .dp-sh{color:#fff;font-size:0.72rem;}
+.dp-lg{font-family:var(--font-body);font-size:0.64rem;color:var(--text-principal);
+  line-height:1.45;}
+.dom-panel.is-final .dp-lg{color:rgba(255,255,255,0.94);}
+
+/* ============ SLIDE 07 — PILARES ============ */
+#slide-07 .slide-inner{padding:1.2rem 2.5rem 0.8rem;}
+.pillars-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;flex:1;min-height:0;}
+.pillar-card{background:var(--blanco);border-radius:var(--radius);
+  border-left:5px solid var(--verde-salud);padding:0.75rem 1rem;
+  box-shadow:0 4px 14px var(--sombra-card);display:flex;flex-direction:column;
+  min-height:0;overflow:hidden;}
+.pillar-ico{font-size:1.3rem;margin-bottom:0.15rem;}
+.pillar-num{font-family:var(--font-display);font-weight:900;
+  font-size:clamp(1.2rem,1.8vw,1.6rem);color:var(--azul-corp);line-height:1;}
+.pillar-name{font-family:var(--font-display);font-weight:700;
+  font-size:clamp(0.88rem,1.1vw,1rem);color:var(--text-principal);margin:0.15rem 0 0.05rem;}
+.pillar-sub{font-style:italic;color:var(--gris-medio);
+  font-size:clamp(0.72rem,0.9vw,0.82rem);margin-bottom:0.4rem;}
+.pillar-desc{font-family:var(--font-body);font-size:clamp(0.78rem,0.95vw,0.88rem);
+  color:var(--text-principal);line-height:1.5;flex:1;min-height:0;overflow:hidden;}
+.pillar-roi{background:rgba(145,191,45,0.1);border-radius:6px;
+  padding:0.35rem 0.65rem;margin-top:0.4rem;flex-shrink:0;}
+.roi-lbl{font-family:var(--font-display);font-weight:700;font-size:0.65rem;
+  color:var(--verde-salud);text-transform:uppercase;letter-spacing:0.05em;}
+.roi-txt{font-family:var(--font-body);font-size:clamp(0.72rem,0.9vw,0.82rem);
+  color:var(--text-principal);margin-top:1px;}
+
+/* ============ SLIDE 08 — PAP ============ */
+#slide-08 .slide-inner{padding:1.8rem 3.5rem 1.2rem;}
+.pap-table{width:100%;border-collapse:collapse;flex-shrink:0;}
+.pap-table th{padding:0.65rem 0.8rem;font-family:var(--font-display);
+  font-weight:700;font-size:clamp(0.85rem,1.1vw,1rem);}
+.pap-table th:first-child{background:var(--bg-medio);color:var(--text-principal);}
+.pap-table th.col-sin{background:var(--terracota);color:#fff;}
+.pap-table th.col-con{background:var(--verde-salud);color:#fff;}
+.pap-table td{padding:0.55rem 0.8rem;border-bottom:1px solid var(--bg-medio);
+  vertical-align:top;line-height:1.5;font-family:var(--font-body);
+  font-size:clamp(0.82rem,1.05vw,0.95rem);color:var(--text-principal);}
+.pap-table td:first-child{background:rgba(234,226,214,0.4);font-weight:600;
+  font-family:var(--font-display);font-size:clamp(0.8rem,1vw,0.92rem);}
+.pap-table td.sc{background:rgba(160,74,58,0.04);}
+.pap-table td.cc{background:rgba(145,191,45,0.04);}
+.pap-table tr:last-child td{border-bottom:none;}
+.pap-bottom{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-top:0.9rem;}
+.pap-bottom .academic-card{font-size:clamp(0.82rem,1.05vw,0.95rem);line-height:1.6;}
+.pap-bottom strong{color:var(--azul-corp);font-family:var(--font-display);}
+
+/* ============ SLIDE 09 — ÉTICA ============ */
+#slide-09 .slide-inner{padding:2.2rem 4rem;justify-content:center;gap:1.2rem;}
+.eth-no{background:rgba(160,74,58,0.07);border-left:5px solid var(--terracota);
+  border-radius:0 var(--radius) var(--radius) 0;padding:1.3rem 1.8rem;}
+.eth-no-item{display:flex;align-items:flex-start;gap:0.7rem;
+  padding:0.4rem 0;font-family:var(--font-body);font-size:clamp(0.95rem,1.3vw,1.1rem);
+  color:var(--text-principal);}
+.eth-x{color:var(--terracota);font-family:var(--font-display);font-weight:900;
+  font-size:1.35rem;line-height:1;min-width:22px;}
+.eth-ben{background:rgba(145,191,45,0.07);border-left:5px solid var(--verde-salud);
+  border-radius:0 var(--radius) var(--radius) 0;padding:1.3rem 1.8rem;}
+.eth-ben-title{font-family:var(--font-display);font-weight:700;color:var(--azul-corp);
+  font-size:clamp(1rem,1.4vw,1.15rem);margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem;}
+.eth-ben p{font-family:var(--font-body);font-size:clamp(0.92rem,1.2vw,1.05rem);
+  color:var(--text-principal);line-height:1.65;margin-bottom:0.5rem;}
+.obj-badge{display:inline-block;background:var(--azul-corp);color:#fff;
+  font-size:0.75rem;font-weight:700;padding:3px 10px;border-radius:4px;margin-bottom:0.5rem;}
+.hl-verde{color:var(--verde-salud);font-weight:700;}
+
+/* ============ SLIDE 10 — CTA ============ */
+#slide-10{background:#CBBD93;}
+#slide-10 .slide-inner{align-items:center;justify-content:center;gap:0;text-align:center;padding:2rem 4rem;}
+#s10-card{background:rgba(255,255,255,0.72);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.6);border-radius:22px;
+  padding:2.5rem 3.5rem;display:flex;flex-direction:column;
+  align-items:center;gap:1.4rem;
+  box-shadow:0 8px 32px rgba(44,38,33,0.18);
+  max-width:780px;width:88%;}
+#s10-logo{max-width:210px;display:block;margin:0 auto;}
+.cta-title{font-family:var(--font-display);font-weight:900;
+  color:var(--text-principal);font-size:clamp(1.5rem,2.8vw,2.5rem);
+  max-width:680px;line-height:1.3;}
+.cta-sep{width:80px;height:4px;background:var(--azul-corp);border-radius:2px;}
+.cta-contacts{display:flex;gap:2.5rem;align-items:center;justify-content:center;flex-wrap:wrap;}
+.cta-link{display:flex;align-items:center;gap:0.6rem;
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(1rem,1.5vw,1.2rem);color:var(--text-principal);transition:color 0.2s;}
+.cta-link:hover{color:var(--azul-corp);}
+
+/* ============ SLIDE 11 — REFS ============ */
+#slide-11 .slide-inner{padding:1.8rem 3.5rem 1.2rem;}
+#btn-volver{background:var(--azul-corp);color:#fff;padding:0.45rem 1.1rem;
+  border-radius:8px;font-size:0.9rem;font-weight:700;margin-bottom:0.9rem;
+  display:inline-flex;align-items:center;gap:0.4rem;flex-shrink:0;}
+#btn-volver:hover{background:#1a4070;}
+.refs-cols{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 1.5rem;flex:1;min-height:0;overflow:hidden;}
+.ref-entry{padding:0.45rem 0.7rem;border-radius:6px;background:var(--blanco);
+  font-family:var(--font-body);font-size:clamp(0.72rem,0.9vw,0.82rem);
+  color:var(--text-principal);line-height:1.55;
+  border-left:3px solid var(--bg-medio);transition:background 0.3s;}
+.ref-entry:hover{background:rgba(34,87,146,0.05);}
+.ref-num{font-family:var(--font-display);font-weight:900;color:var(--azul-corp);
+  min-width:24px;display:inline-block;}
+.ref-entry.hl{background:rgba(34,87,146,0.18);}
+</style>
+</head>
+<body>
+
+<!-- ======= MODALS & OVERLAYS (fuera del wrapper) ======= -->
+<div id="loss-modal-overlay">
+  <div id="loss-modal">
+    <div id="lm-header">
+      <div id="lm-num">1</div>
+      <div id="lm-title">Título</div>
+      <button id="lm-close" onclick="closeLM()">✕</button>
+    </div>
+    <div id="lm-body">
+      <p id="lm-desc"></p>
+      <div id="lm-impact">
+        <div class="lbl">💰 Impacto Económico Estimado</div>
+        <div class="amt" id="lm-amt"></div>
+      </div>
+    </div>
+    <div id="lm-footer">
+      <button class="lm-nav" id="lm-prev" onclick="navLM(-1)">← Anterior</button>
+      <button class="lm-nav" id="lm-next" onclick="navLM(1)">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<div id="index-overlay">
+  <div id="index-panel">
+    <button id="index-close">✕</button>
+    <h3>📋 Índice de Contenidos</h3>
+    <div id="index-list">
+      <div class="index-item" onclick="goIdx(0)"><span class="idx-num">01</span>El Gancho — El costo invisible de navegar</div>
+      <div class="index-item" onclick="goIdx(1)"><span class="idx-num">02</span>Top 10 Pérdidas Ocultas</div>
+      <div class="index-item" onclick="goIdx(2)"><span class="idx-num">03</span>El Paradigma del Iceberg</div>
+      <div class="index-item" onclick="goIdx(3)"><span class="idx-num">04</span>El Contexto de la Hidrovía</div>
+      <div class="index-item" onclick="goIdx(4)"><span class="idx-num">05</span>Mapeo Clínico Interactivo</div>
+      <div class="index-item" onclick="goIdx(5)"><span class="idx-num">06</span>El Costo de la Inacción</div>
+      <div class="index-item" onclick="goIdx(6)"><span class="idx-num">07</span>Propuesta de Valor: Gente Saludable</div>
+      <div class="index-item" onclick="goIdx(7)"><span class="idx-num">08</span>Primeros Auxilios Psicológicos</div>
+      <div class="index-item" onclick="goIdx(8)"><span class="idx-num">09</span>Compromiso Ético y Corporativo</div>
+      <div class="index-item" onclick="goIdx(9)"><span class="idx-num">10</span>Agenda tu Reunión</div>
+      <div class="index-item" onclick="goIdx(10)"><span class="idx-num">11</span>Referencias Bibliográficas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= UI GLOBAL ======= -->
+<button id="index-btn" onclick="openIndex()">≡ Índice</button>
+<button class="nav-arrow" id="prev-arrow" onclick="goToSlide(cur-1)">&#8592;</button>
+<button class="nav-arrow" id="next-arrow" onclick="goToSlide(cur+1)">&#8594;</button>
+
+<!-- ======= CARRUSEL ======= -->
+<div id="presentation-wrapper">
+<div id="slides-track">
+
+<!-- ===== S01 HERO ===== -->
+<section class="slide" id="slide-01">
+  <video autoplay muted loop playsinline id="bg-video" preload="auto">
+    <source src="video_barco.mp4" type="video/mp4">
+    <source src="./video_barco.mp4" type="video/mp4">
+  </video>
+  <div id="s01-overlay"></div>
+  <div id="s01-box">
+    <img src="logofblancovector.png" alt="Gente Saludable" id="s01-logo">
+    <h1 id="s01-title">El costo invisible de navegar</h1>
+    <p id="s01-subtitle">Cómo la <span class="hl">SALUD MENTAL</span> de la tripulación impacta directamente en la seguridad, productividad y rentabilidad neta de la flota en la Hidrovía.</p>
+  </div>
+</section>
+
+<!-- ===== S02 TOP 10 ===== -->
+<section class="slide" id="slide-02">
+  <div class="slide-inner">
+    <div class="s02-header">
+      <h2 class="slide-title">Top 10 de Pérdidas Ocultas</h2>
+      <p class="slide-subtitle">Factor Humano y Salud Mental en Navieras — Haz clic en cada cuadrante para revelar el impacto</p>
+    </div>
+    <div class="losses-grid" id="losses-grid"></div>
+  </div>
+</section>
+
+<!-- ===== S03 ICEBERG ===== -->
+<section class="slide" id="slide-03">
+  <div class="slide-inner">
+    <div id="s03-quote">"La mayoría de las empresas interviene cuando el problema ya emergió en forma de accidente, multa o renuncia. Eso es gestionar la consecuencia, no el riesgo."</div>
+    <div id="s03-main">
+      <div id="s03-left">
+        <svg id="iceberg-svg" viewBox="0 0 260 380" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gtop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#E8F4FF"/><stop offset="100%" stop-color="#B0C4D8"/>
+            </linearGradient>
+            <linearGradient id="gbot" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1A3A5C"/><stop offset="100%" stop-color="#0D1F38"/>
+            </linearGradient>
+            <linearGradient id="gwat" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(32,84,154,0.3)"/>
+              <stop offset="100%" stop-color="rgba(32,84,154,0.04)"/>
+            </linearGradient>
+          </defs>
+          <g id="iceberg-top">
+            <path d="M130,10 L190,118 L205,145 L158,152 L130,162 L102,152 L58,145 L74,118 Z"
+              fill="url(#gtop)" stroke="rgba(32,84,154,0.3)" stroke-width="1.5"/>
+            <path d="M130,10 L143,46 L156,85 L149,118 L130,162 L111,118 L107,85 L119,46 Z"
+              fill="rgba(255,255,255,0.22)"/>
+          </g>
+          <rect x="0" y="148" width="260" height="232" fill="url(#gwat)"/>
+          <path id="water-line" d="M0,148 Q32,142 66,148 Q100,154 130,148 Q160,142 194,148 Q228,154 260,148 L260,168 Q228,174 194,168 Q160,162 130,168 Q100,174 66,168 Q32,162 0,168 Z"
+            fill="rgba(32,84,154,0.22)" stroke="#225792" stroke-width="1.5"/>
+          <g id="iceberg-bottom" style="opacity:0;transform:translateY(-30px)">
+            <path d="M58,148 L36,204 L24,264 L32,316 L82,350 L130,363 L178,350 L228,316 L236,264 L224,204 L202,148 L158,152 L130,162 L102,152 Z"
+              fill="url(#gbot)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+            <path d="M92,178 L77,234 L82,294 L130,334 L178,294 L183,234 L168,178 Z"
+              fill="rgba(255,255,255,0.05)"/>
+          </g>
+        </svg>
+        <button id="s03-toggle-btn" onclick="toggleIce()">🔍 Mostrar lo oculto</button>
+      </div>
+      <div id="s03-right">
+        <div class="s03-panel" id="s03-panel-a">
+          <div class="s03-ptitle" style="color:var(--azul-corp);border-bottom:2px solid var(--azul-corp);padding-bottom:6px;margin-bottom:8px;">🔺 Lo Visible y Cuantificable</div>
+          <span class="s03-badge badge-r">Gestionar esto es actuar de forma REACTIVA</span>
+          <div class="s03-items panel-visible">
+            <div class="iceberg-item"><span class="ico">🚢</span>Accidentes y Siniestros Graves</div>
+            <div class="iceberg-item"><span class="ico">🔄</span>Renuncias y Alta Rotación</div>
+            <div class="iceberg-item"><span class="ico">⚠️</span>Multas y Sanciones</div>
+            <div class="iceberg-item"><span class="ico">📦</span>Daños a la Carga y a la Maquinaria</div>
+            <div class="iceberg-item"><span class="ico">🏥</span>Absentismo Médico Prolongado</div>
+            <div class="iceberg-item"><span class="ico">⚖️</span>Litigios y Demandas Laborales</div>
+            <div class="iceberg-item"><span class="ico">🛑</span>Paralización de la Flota</div>
+          </div>
+        </div>
+        <div class="s03-panel" id="s03-panel-b" style="opacity:0;pointer-events:none;">
+          <div class="s03-ptitle" style="color:#1A3A5C;border-bottom:2px solid #1A3A5C;padding-bottom:6px;margin-bottom:8px;">🌊 Lo Oculto y Subyacente</div>
+          <span class="s03-badge badge-p">Gestionar esto es actuar de forma PREVENTIVA</span>
+          <div class="s03-items panel-hidden">
+            <div class="iceberg-item"><span class="ico">😴</span>Fatiga Crónica y Déficit de Sueño</div>
+            <div class="iceberg-item"><span class="ico">🔥</span>Estrés Laboral y Burnout</div>
+            <div class="iceberg-item"><span class="ico">👻</span>Presentismo y Apatía</div>
+            <div class="iceberg-item"><span class="ico">🔇</span>Errores Sub-notificados (Incidentes Blancos)</div>
+            <div class="iceberg-item"><span class="ico">🧠</span>Demandas Psicológicas y Falta de Control</div>
+            <div class="iceberg-item"><span class="ico">👥</span>Déficit de Apoyo Social y Aislamiento</div>
+            <div class="iceberg-item"><span class="ico">😰</span>Trastornos Psicosomáticos Silenciosos</div>
+            <div class="iceberg-item"><span class="ico">🎭</span>Sobrecarga Emocional</div>
+          </div>
+          <div class="academic-card" id="s03-conclusion" style="font-size:clamp(0.85rem,1.1vw,0.95rem);line-height:1.6;border-color:#1A3A5C;">
+            "Mientras las navieras sigan invirtiendo exclusivamente en auditorías de daños, seguros y abogados, seguirán sufriendo pérdidas inexplicables. La verdadera rentabilidad exige gestionar la salud mental <strong>antes</strong> de que se convierta en el próximo siniestro millonario."
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S04 CONTEXTO ===== -->
+<section class="slide" id="slide-04">
+  <div class="slide-inner">
+    <h2 class="slide-title">El Contexto de la Hidrovía</h2>
+    <p class="slide-subtitle">Las condiciones de aislamiento y las guardias 6/6 potencian los síntomas clínicos en la tripulación.</p>
+    <div class="quads-grid">
+      <div class="quad-card q-f">
+        <div class="quad-header"><span class="quad-icon">💓</span><span class="quad-title">Cuadrante Físico</span></div>
+        <ul class="quad-list">
+          <li>Fatiga crónica y agotamiento <sup class="ref-link" onclick="goToRef(16)">¹⁶</sup></li>
+          <li>Alteraciones severas del sueño <sup class="ref-link" onclick="goToRef(11)">¹¹</sup></li>
+          <li>Dolores musculoesqueléticos <sup class="ref-link" onclick="goToRef(10)">¹⁰</sup></li>
+          <li>Hipertensión y somatización <sup class="ref-link" onclick="goToRef(17)">¹⁷</sup></li>
+        </ul>
+      </div>
+      <div class="quad-card q-e">
+        <div class="quad-header"><span class="quad-icon">🧠</span><span class="quad-title">Cuadrante Emocional</span></div>
+        <ul class="quad-list">
+          <li>Ansiedad y tensión permanente <sup class="ref-link" onclick="goToRef(14)">¹⁴</sup></li>
+          <li>Episodios depresivos o apatía <sup class="ref-link" onclick="goToRef(13)">¹³</sup></li>
+          <li>Irritabilidad e hipersensibilidad <sup class="ref-link" onclick="goToRef(17)">¹⁷</sup></li>
+          <li>Sensación de encierro/atrapamiento <sup class="ref-link" onclick="goToRef(14)">¹⁴</sup></li>
+        </ul>
+      </div>
+      <div class="quad-card q-c">
+        <div class="quad-header"><span class="quad-icon">🏃</span><span class="quad-title">Cuadrante Conductual</span></div>
+        <ul class="quad-list">
+          <li>Negligencia procedural (piloto automático) <sup class="ref-link" onclick="goToRef(12)">¹²</sup></li>
+          <li>Consumo de sustancias — automedicación <sup class="ref-link" onclick="goToRef(15)">¹⁵</sup></li>
+          <li>Conductas de riesgo imprudentes <sup class="ref-link" onclick="goToRef(17)">¹⁷</sup></li>
+          <li>Falta de apetito o atracones compulsivos <sup class="ref-link" onclick="goToRef(15)">¹⁵</sup></li>
+        </ul>
+      </div>
+      <div class="quad-card q-r">
+        <div class="quad-header"><span class="quad-icon">👥</span><span class="quad-title">Cuadrante Relacional</span></div>
+        <ul class="quad-list">
+          <li>Conflictos directos con la tripulación <sup class="ref-link" onclick="goToRef(13)">¹³</sup></li>
+          <li>Aislamiento social a bordo <sup class="ref-link" onclick="goToRef(15)">¹⁵</sup></li>
+          <li>Debilitamiento de vínculos familiares <sup class="ref-link" onclick="goToRef(17)">¹⁷</sup></li>
+          <li>Insubordinación o fricción con mandos <sup class="ref-link" onclick="goToRef(13)">¹³</sup></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S05 MAPEO CLÍNICO ===== -->
+<section class="slide" id="slide-05">
+  <div class="slide-inner">
+    <h2 class="slide-title">Mapeo Clínico Interactivo — Red de Impacto Financiero</h2>
+    <p class="slide-subtitle">Seleccioná un diagnóstico para ver sus síntomas y la carga financiera asociada en las operaciones.</p>
+    <div id="s05-layout">
+      <div id="s05-col-left">
+        <button class="diag-btn" onclick="selDiag('ansiedad',this)">1. Trastorno de Ansiedad</button>
+        <button class="diag-btn" onclick="selDiag('sueno',this)">2. Trastorno del Sueño</button>
+        <button class="diag-btn" onclick="selDiag('burnout',this)">3. Síndrome de Burnout</button>
+        <button class="diag-btn" onclick="selDiag('alimentacion',this)">4. Trast. de Alimentación</button>
+        <button class="diag-btn" onclick="selDiag('tept',this)">5. Estrés Postraumático</button>
+        <button class="diag-btn" onclick="selDiag('depresion',this)">6. Depresión</button>
+        <button class="diag-btn" onclick="selDiag('ira',this)">7. Trastorno Explosivo (Ira)</button>
+      </div>
+      <div id="s05-col-center">
+        <div id="s05-sym-panel"><p class="sym-placeholder">← Seleccioná un diagnóstico para ver los síntomas en los 4 cuadrantes</p></div>
+      </div>
+      <div id="s05-col-right">
+        <div id="s05-loss-panel">
+          <div class="loss-node-hdr">Pérdidas Financieras Asociadas</div>
+          <div class="nodes-list">
+            <div class="loss-node" id="nd-1"><span class="nn">1</span><span class="nm">Accidentes por Fatiga</span><span class="nb" id="nb-1"></span></div>
+            <div class="loss-node" id="nd-2"><span class="nn">2</span><span class="nm">Absentismo Médico</span><span class="nb" id="nb-2"></span></div>
+            <div class="loss-node" id="nd-3"><span class="nn">3</span><span class="nm">Alta Rotación</span><span class="nb" id="nb-3"></span></div>
+            <div class="loss-node" id="nd-4"><span class="nn">4</span><span class="nm">Errores Sub-notificados</span><span class="nb" id="nb-4"></span></div>
+            <div class="loss-node" id="nd-5"><span class="nn">5</span><span class="nm">Daño a la Carga</span><span class="nb" id="nb-5"></span></div>
+            <div class="loss-node" id="nd-6"><span class="nn">6</span><span class="nm">Sanciones</span><span class="nb" id="nb-6"></span></div>
+            <div class="loss-node" id="nd-7"><span class="nn">7</span><span class="nm">Baja Eficiencia</span><span class="nb" id="nb-7"></span></div>
+            <div class="loss-node" id="nd-8"><span class="nn">8</span><span class="nm">Conflictos Sindicales</span><span class="nb" id="nb-8"></span></div>
+            <div class="loss-node" id="nd-9"><span class="nn">9</span><span class="nm">Pérdida de Contratos</span><span class="nb" id="nb-9"></span></div>
+            <div class="loss-node" id="nd-10"><span class="nn">10</span><span class="nm">Litigios Laborales</span><span class="nb" id="nb-10"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S06 DOMINÓ ===== -->
+<section class="slide" id="slide-06">
+  <div class="slide-inner">
+    <div class="s06-hdr">
+      <div>
+        <h2 class="slide-title">¿Qué pasa si la empresa decide "esperar y ver"?</h2>
+        <p class="slide-subtitle">Hacé clic en la primera ficha o en Iniciar para ver el efecto dominó en cascada.</p>
+      </div>
+      <div class="s06-btns">
+        <button id="btn-start-dom" onclick="triggerDom()">▶ Iniciar Cascada</button>
+        <button id="btn-reset-dom" onclick="resetDom()">↩ Reiniciar</button>
+      </div>
+    </div>
+    <div id="s06-area">
+      <div id="s06-tiles"></div>
+      <div id="s06-panels"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S07 PILARES ===== -->
+<section class="slide" id="slide-07">
+  <div class="slide-inner">
+    <h2 class="slide-title">Propuesta de Valor: Programa "Gente Saludable" para la Industria Naviera</h2>
+    <p class="slide-subtitle">Transformando el Riesgo Psicosocial en Rentabilidad Operativa — Un programa integral de 4 pilares.</p>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-ico">🧠</div><div class="pillar-num">01</div>
+        <div class="pillar-name">Atención Psicológica</div>
+        <div class="pillar-sub">Presencial o Virtual</div>
+        <p class="pillar-desc">Intervención especializada en Trastornos de Ansiedad, Depresión y desgaste familiar (síndrome de la "Familia Acordeón"). Abordar la renuncia pasiva permite que el tripulante recupere su capacidad de afrontamiento frente a las exigencias del entorno fluvial.</p>
+        <div class="pillar-roi"><div class="roi-lbl">↗ ROI</div><div class="roi-txt">Reduce Absentismo · Alta Rotación · Presentismo</div></div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-ico">🛟</div><div class="pillar-num">02</div>
+        <div class="pillar-name">Primeros Auxilios Psicológicos (PAP)</div>
+        <div class="pillar-sub">Curso especializado</div>
+        <p class="pillar-desc">Capacitación en los principios "Ver, Escuchar y Vincular" ante situaciones críticas como accidentes a bordo o malas noticias en tierra. <sup class="ref-link" onclick="goToRef(19)">¹⁹</sup> Los PAP reducen el desarrollo del Estrés Post-Traumático.</p>
+        <div class="pillar-roi"><div class="roi-lbl">↗ ROI</div><div class="roi-txt">Previene TEPT post-accidente · Mitiga errores humanos severos</div></div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-ico">📱</div><div class="pillar-num">03</div>
+        <div class="pillar-name">Guardia Clínica 24/7</div>
+        <div class="pillar-sub">Canal de contención inmediata</div>
+        <p class="pillar-desc">Canal de contención inmediata para crisis. La intervención en tiempo real reduce reacciones impulsivas que podrían terminar en daños a la carga, la maquinaria, los demás o a sí mismo.</p>
+        <div class="pillar-roi"><div class="roi-lbl">↗ ROI</div><div class="roi-txt">Previene conductas de riesgo · Reduce conflictos sindicales</div></div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-ico">📋</div><div class="pillar-num">04</div>
+        <div class="pillar-name">Charlas Especializadas y Preventivas</div>
+        <div class="pillar-sub">Psicoeducación a bordo</div>
+        <p class="pillar-desc">Herramientas psicoeducativas para gestión del estrés, higiene del sueño y hábitos saludables. Mejorar la higiene del sueño previene la negligencia procedural en maniobras críticas de la Hidrovía.</p>
+        <div class="pillar-roi"><div class="roi-lbl">↗ ROI</div><div class="roi-txt">Disminución de accidentes por fatiga · Mejora del sueño</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S08 PAP ===== -->
+<section class="slide" id="slide-08">
+  <div class="slide-inner">
+    <h2 class="slide-title">Cuadro Comparativo: Utilidad de los Primeros Auxilios Psicológicos (PAP)</h2>
+    <p class="slide-subtitle">Referencia: Everly &amp; Lating (2022). The Johns Hopkins Guide to Psychological First Aid. <sup class="ref-link" onclick="goToRef(19)">¹⁹</sup></p>
+    <table class="pap-table">
+      <thead><tr>
+        <th>Indicador de Respuesta</th>
+        <th class="col-sin">✗ Sin PAP</th>
+        <th class="col-con">✓ Con PAP</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Detección y contención inicial</td><td class="sc">Improvisación que puede empeorar la situación y aumentar la angustia.</td><td class="cc">Presencia compasiva inmediata para estabilizar reacciones mediante escucha reflexiva.</td></tr>
+        <tr><td>Evaluación de urgencia (Triaje)</td><td class="sc">Riesgo de desperdiciar recursos sin distinguir estrés temporal de disfunción severa.</td><td class="cc">Triaje psicológico estructurado para priorizar por inestabilidad conductual o cognitiva.</td></tr>
+        <tr><td>Mitigación del estrés agudo</td><td class="sc">Las personas pueden empeorar su estado, desarrollando reacciones impulsivas.</td><td class="cc">Orientación anticipatoria, reencuadre cognitivo y manejo del estrés para infundir esperanza.</td></tr>
+        <tr><td>Resolución y seguimiento</td><td class="sc">El incidente concluye sin directriz clara ni orientación sobre recursos de apoyo.</td><td class="cc">Acceso a atención continua; determina autonomía del individuo o derivación a nivel superior.</td></tr>
+      </tbody>
+    </table>
+    <div class="pap-bottom">
+      <div class="academic-card"><strong>Para los tripulantes:</strong><br>Los PAP ayudan a recuperarse de la adversidad estabilizando reacciones agudas y fomentando la resiliencia natural. El tratamiento de primera línea promueve menores tasas de síntomas invalidantes y mejor funcionamiento social. <sup class="ref-link" onclick="goToRef(19)">¹⁹</sup></div>
+      <div class="academic-card"><strong>Para las empresas:</strong><br>Los PAP funcionan como un "multiplicador de fuerza" que amplía la capacidad de respuesta psicológica. Al capacitar una Brigada de Emergencia Interna, la empresa mejora su resiliencia organizacional ante incidentes críticos. <sup class="ref-link" onclick="goToRef(19)">¹⁹</sup></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S09 ÉTICA ===== -->
+<section class="slide" id="slide-09">
+  <div class="slide-inner">
+    <h2 class="slide-title">El Compromiso Ético y Corporativo</h2>
+    <div style="max-width:780px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:1.2rem;flex:1;justify-content:center;">
+      <div class="eth-no ethics-block">
+        <div class="eth-no-item"><span class="eth-x">✗</span><span>NO es una auditoría punitiva de la tripulación.</span></div>
+        <div class="eth-no-item"><span class="eth-x">✗</span><span>NO se realizan evaluaciones de rendimiento operativo.</span></div>
+        <div class="eth-no-item"><span class="eth-x">✗</span><span>NO se revelan historiales clínicos individuales a la empresa.</span></div>
+      </div>
+      <div class="eth-ben ethics-block">
+        <div class="eth-ben-title">🎁 Beneficio Adicional Exclusivo</div>
+        <p>La contratación de cualquiera de nuestros servicios incluye, sin costo adicional, una <strong>Charla de Socialización On-Board o en Base.</strong></p>
+        <span class="obj-badge">Objetivo Estratégico</span>
+        <p>Presentar el programa frente a la tripulación para derribar el estigma cultural, explicar que garantizamos <span class="hl-verde">estricto secreto profesional clínico</span>. Con el fin de potenciar el uso del servicio clínico de manera <span class="hl-verde">preventiva</span> y no solamente reparatoria. Aplica tanto para los malestares fisiológicos como psicológicos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== S10 CTA ===== -->
+<section class="slide" id="slide-10">
+  <div class="slide-inner">
+    <div id="s10-card">
+    <img src="logofblancovector.png" alt="Gente Saludable" id="s10-logo">
+    <h2 class="cta-title">Haga una cita para agendar una reunión y evaluar la implementación de un programa a medida en su flota.</h2>
+    <div class="cta-sep"></div>
+    <div class="cta-contacts">
+      <a href="https://wa.me/595994532233" target="_blank" class="cta-link">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        +595 994 532233
+      </a>
+      <a href="mailto:info@gentesaludablepy.com" class="cta-link">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--azul-corp)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        info@gentesaludablepy.com
+      </a>
+    </div>
+    </div><!-- /s10-card -->
+  </div>
+</section>
+
+<!-- ===== S11 REFERENCIAS ===== -->
+<section class="slide" id="slide-11">
+  <div class="slide-inner">
+    <h2 class="slide-title">Referencias Bibliográficas</h2>
+    <p class="slide-subtitle">Formato APA — Fuentes citadas en esta presentación</p>
+    <button id="btn-volver" onclick="goToSlide(prev)">← Volver</button>
+    <div class="refs-cols">
+      <div><div class="ref-entry" id="ref-1"><span class="ref-num">¹</span> Rozadilla, B. (2018). Paraguay: una economía potenciada desde el agro (parte II). <em>Bolsa de Comercio de Rosario.</em></div>
+      <div class="ref-entry" id="ref-2"><span class="ref-num">²</span> Laurell, A. C. (Coord.). (1993). <em>Para la investigación sobre la salud de los trabajadores.</em> Washington, DC: OPS.</div>
+      <div class="ref-entry" id="ref-3"><span class="ref-num">³</span> CEPAL. (2020). <em>Protección social universal en América Latina y el Caribe.</em> Santiago: Naciones Unidas.</div>
+      <div class="ref-entry" id="ref-4"><span class="ref-num">⁴</span> Noriega, M. (1993). Organización laboral, exigencias y enfermedad. En Laurell (Coord.), <em>Para la investigación...</em> (pp. 167-188). OPS.</div>
+      <div class="ref-entry" id="ref-5"><span class="ref-num">⁵</span> Buere, G. (2014). <em>El desarrollo de infraestructuras en América del Sur: la Hidrovía Paraguay-Paraná.</em> UdelaR.</div>
+      <div class="ref-entry" id="ref-6"><span class="ref-num">⁶</span> CAFYM. (2017). <em>Informes estadísticos sobre tráfico fluvial y estimaciones de flota.</em> Asunción.</div>
+      <div class="ref-entry" id="ref-7"><span class="ref-num">⁷</span> OIT. (2016). <em>Panorama Laboral 2016: América Latina y el Caribe.</em> Lima: OIT.</div>
+      <div class="ref-entry" id="ref-8"><span class="ref-num">⁸</span> Novick, M. (1993). Alcances y críticas de los métodos de medición. En Laurell (Coord.), OPS (pp. 99-134).</div>
+      <div class="ref-entry" id="ref-9"><span class="ref-num">⁹</span> Méndez, R. (2007). <em>Tratado de Medicina del Trabajo</em> (Vol. I). Elsevier.</div>
+      <div class="ref-entry" id="ref-10"><span class="ref-num">¹⁰</span> Gil Hernández, F. (2012). <em>Tratado de medicina del trabajo.</em> Elsevier Masson.</div></div>
+      <div><div class="ref-entry" id="ref-11"><span class="ref-num">¹¹</span> Leonardi, F. (2024). <em>Imparare a dormire: Guida pratica contro l'insonnia.</em> Ponte alle Grazie.</div>
+      <div class="ref-entry" id="ref-12"><span class="ref-num">¹²</span> Moreno Jiménez, B. (2011). Factores y riesgos laborales psicosociales. <em>Med. y Seg. del Trabajo, 57</em>(Supl. 1), 1-19.</div>
+      <div class="ref-entry" id="ref-13"><span class="ref-num">¹³</span> Muriana, E., Pettenò, L., &amp; Verbitz, T. (2007). <em>Las caras de la depresión.</em> Herder.</div>
+      <div class="ref-entry" id="ref-14"><span class="ref-num">¹⁴</span> Nardone, G. (2007). <em>Miedo, pánico, fobias: La terapia breve.</em> Herder.</div>
+      <div class="ref-entry" id="ref-15"><span class="ref-num">¹⁵</span> Nardone, G. (2014). <em>Psicotrampas: Identifica las trampas psicológicas.</em> Paidós.</div>
+      <div class="ref-entry" id="ref-16"><span class="ref-num">¹⁶</span> Ruiz-Frutos, C. et al. (2022). <em>Salud laboral: Conceptos y técnicas</em> (5ª ed.). Elsevier.</div>
+      <div class="ref-entry" id="ref-17"><span class="ref-num">¹⁷</span> van der Kolk, B. (2015). <em>El cuerpo lleva la cuenta: Cerebro, mente y cuerpo en la superación del trauma.</em> Eleftheria.</div>
+      <div class="ref-entry" id="ref-18"><span class="ref-num">¹⁸</span> American Psychiatric Association. (2014). <em>Guía de consulta del DSM-5.</em> American Psychiatric Publishing.</div>
+      <div class="ref-entry" id="ref-19"><span class="ref-num">¹⁹</span> Everly, G. S., Jr., &amp; Lating, J. M. (2022). <em>The Johns Hopkins Guide to Psychological First Aid</em> (2nd ed.). Johns Hopkins University Press.</div></div>
+    </div>
+  </div>
+</section>
+
+</div></div><!-- /slides-track /wrapper -->
+<script>
+/* ======= NAVEGACIÓN ======= */
+let cur = 0, prev = 0;
+const TOTAL = 11;
+const track = document.getElementById('slides-track');
+
+function goToSlide(n) {
+  if (n < 0 || n >= TOTAL) return;
+  prev = cur; cur = n;
+  track.style.transform = `translateX(-${cur * 100}vw)`;
+  document.getElementById('prev-arrow').disabled = cur === 0;
+  document.getElementById('next-arrow').disabled = cur === TOTAL - 1;
+  if (cur === 9) animCTA();
+  if (cur === 8) animEthics();
+}
+function goIdx(n) { closeIndex(); goToSlide(n); }
+function goToRef(n) {
+  prev = cur; goToSlide(10);
+  setTimeout(() => {
+    const el = document.getElementById('ref-' + n);
+    if (!el) return;
+    el.classList.add('hl');
+    setTimeout(() => el.classList.remove('hl'), 1800);
+  }, 600);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') goToSlide(cur + 1);
+  if (e.key === 'ArrowLeft') goToSlide(cur - 1);
+  if (e.key === 'Escape') { closeLM(); closeIndex(); }
+});
+goToSlide(0);
+
+/* ======= ÍNDICE ======= */
+function openIndex() {
+  const ov = document.getElementById('index-overlay');
+  ov.style.display = 'flex';
+  gsap.fromTo('#index-panel', {opacity:0,y:-18},{opacity:1,y:0,duration:0.3});
+}
+function closeIndex() {
+  gsap.to('#index-panel', {opacity:0,y:-10,duration:0.2,onComplete:()=>{
+    document.getElementById('index-overlay').style.display='none';
+  }});
+}
+document.getElementById('index-close').onclick = closeIndex;
+document.getElementById('index-overlay').onclick = e => {
+  if (e.target.id === 'index-overlay') closeIndex();
+};
+
+/* ======= SLIDE 01 — ANIMACIÓN ======= */
+window.addEventListener('load', () => {
+  const vid = document.getElementById('bg-video');
+  if (vid) {
+    const tryPlay = () => {
+      vid.play().catch(err => {
+        console.log('Autoplay blocked, retrying on interaction:', err);
+        document.addEventListener('click', () => vid.play().catch(()=>{}), {once:true});
+        document.addEventListener('keydown', () => vid.play().catch(()=>{}), {once:true});
+      });
+    };
+    vid.addEventListener('loadeddata', tryPlay);
+    vid.addEventListener('canplay', tryPlay);
+    tryPlay();
+    vid.onerror = () => { 
+      console.log('Video error - using gradient fallback');
+      vid.style.display='none'; 
+    };
+  }
+  // Logo fallbacks
+  ['s01-logo','s10-logo'].forEach(id => {
+    const img = document.getElementById(id);
+    if (!img) return;
+    img.onerror = function() {
+      const d = document.createElement('div');
+      d.style.cssText='font-family:Montserrat,sans-serif;font-weight:900;font-size:1.6rem;letter-spacing:2px;margin-bottom:1rem;text-align:center;';
+      d.innerHTML='<span style="color:#225792">GENTE</span> <span style="color:#91BF2D">SALUDABLE</span>';
+      this.replaceWith(d);
+    };
+  });
+  const t = document.getElementById('s01-title');
+  const txt = t.textContent;
+  t.innerHTML = txt.split('').map(c => c===' '?'&nbsp;':`<span>${c}</span>`).join('');
+  gsap.from('#s01-logo',{opacity:0,scale:0.8,duration:0.6,delay:0.1});
+  gsap.from('#s01-title span',{opacity:0,y:28,stagger:0.04,duration:0.55,delay:0.4,ease:'power2.out'});
+  gsap.from('#s01-subtitle',{opacity:0,y:18,duration:0.6,delay:1.1});
+  buildLossGrid();
+  buildDomino();
+});
+
+/* ======= SLIDE 02 — MODAL ======= */
+const losses = [
+  {id:1,titulo:'Accidentes por Fatiga',desc:'El error humano originado por el déficit de sueño en maniobras críticas es una de las principales causas de colisiones y varaduras. En la Hidrovía Paraguay-Paraná, las demoras por accidentes o bajantes mal gestionadas imponen altos sobrecostos, afectando severamente el flujo de barcazas.',impacto:'USD $50,000 – $200,000+',ref:1},
+  {id:2,titulo:'Absentismo Médico',desc:'Las licencias psiquiátricas y médicas derivadas de las altas exigencias laborales exigen reemplazos urgentes, lo que implica el traslado rápido de personal a puertos intermedios y el pago de salarios dobles para no detener las operaciones.',impacto:'USD $5,000 – $15,000 / mes',ref:2},
+  {id:3,titulo:'Alta Rotación',desc:'La precariedad, el aislamiento fluvial y la falta de condiciones óptimas propician la renuncia de oficiales y tripulantes clave. Los procesos de reclutamiento, inducción y evaluación médica de nuevos navegantes representan gastos fijos muy elevados.',impacto:'USD $10,000 – $25,000 c/u',ref:3},
+  {id:4,titulo:'Errores Sub-notificados',desc:'El temor a sanciones y el estrés operativo permanente fomentan que las tripulaciones oculten incidentes menores o negligencias. Estos fallos latentes terminan causando un desgaste acelerado a las maquinarias e infraestructuras.',impacto:'USD $20,000 – $50,000',ref:4},
+  {id:5,titulo:'Daño a la Carga',desc:'El manejo deficiente, las alteraciones en la coordinación del equipo o la falta de concentración durante el estibaje y la navegación derivan en la merma o ruina de la mercancía, afectando principalmente al transporte de soja y derivados agrícolas.',impacto:'USD $15,000 – $80,000',ref:5},
+  {id:6,titulo:'Sanciones por Incumplimiento',desc:'La sobreexigencia en las jornadas y la falta de planificación en los relevos generan infracciones a los códigos laborales de navegación vigentes, resultando en fuertes multas económicas y la inmovilización de buques.',impacto:'USD $10,000 – $30,000',ref:6},
+  {id:7,titulo:'Baja Eficiencia (Presentismo)',desc:'Los tripulantes asisten a sus puestos, pero rinden muy por debajo de los estándares debido al agotamiento mental, el burnout y la apatía. Esto disminuye la eficiencia logística, prolongando los tiempos de viaje y generando excesivo gasto en combustible.',impacto:'15% de caída operativa',ref:7},
+  {id:8,titulo:'Conflictos Sindicales',desc:'Un clima laboral hostil y autoritario deteriora gravemente las relaciones a bordo y en los puertos. Esta situación se traduce en reclamos colectivos, huelgas y paros que detienen completamente la cadena de suministro logístico.',impacto:'Lucro cesante diario',ref:8},
+  {id:9,titulo:'Pérdida de Contratos',desc:'El deterioro progresivo de la imagen corporativa frente a los grandes agroexportadores, debido a la falta de fiabilidad en las operaciones y repetidos accidentes, bloquea las negociaciones y fletamentos a largo plazo.',impacto:'Impacto a largo plazo',ref:1},
+  {id:10,titulo:'Litigios Laborales',desc:'El desgaste profesional agudo y las enfermedades de origen laboral vinculadas a la falta de higiene, seguridad y salud mental abren la puerta a demandas costosas y extensos peritajes médicos judiciales contra los armadores.',impacto:'USD $100,000+',ref:9}
+];
+let lmIdx = 0;
+
+function buildLossGrid() {
+  const g = document.getElementById('losses-grid');
+  if (!g) return;
+  g.innerHTML = '';
+  losses.forEach((l, i) => {
+    const c = document.createElement('div');
+    c.className = 'loss-card';
+    c.innerHTML = `<div class="loss-num">${l.id}</div><div class="loss-title-sm">${l.titulo}</div>`;
+    c.addEventListener('click', () => openLM(i));
+    g.appendChild(c);
+  });
+}
+
+function openLM(i) {
+  lmIdx = i;
+  const l = losses[i];
+  document.getElementById('lm-num').textContent = l.id;
+  document.getElementById('lm-title').textContent = l.titulo;
+  document.getElementById('lm-desc').textContent = l.desc;
+  document.getElementById('lm-amt').textContent = l.impacto;
+  document.getElementById('lm-prev').disabled = i === 0;
+  document.getElementById('lm-next').disabled = i === losses.length - 1;
+  const ov = document.getElementById('loss-modal-overlay');
+  ov.style.display = 'flex';
+  gsap.fromTo('#loss-modal',{opacity:0,scale:0.82},{opacity:1,scale:1,duration:0.36,ease:'back.out(1.5)'});
+}
+
+function closeLM() {
+  gsap.to('#loss-modal',{opacity:0,scale:0.84,duration:0.22,onComplete:()=>{
+    document.getElementById('loss-modal-overlay').style.display='none';
+  }});
+}
+
+function navLM(d) {
+  const ni = lmIdx + d;
+  if (ni < 0 || ni >= losses.length) return;
+  gsap.to('#lm-body',{opacity:0,duration:0.12,onComplete:()=>{
+    openLM(ni);
+    gsap.to('#lm-body',{opacity:1,duration:0.18});
+  }});
+}
+
+document.getElementById('loss-modal-overlay').addEventListener('click', e => {
+  if (e.target.id === 'loss-modal-overlay') closeLM();
+});
+
+/* ======= SLIDE 03 — ICEBERG ======= */
+let iceOff = false;
+function toggleIce() {
+  const btn = document.getElementById('s03-toggle-btn');
+  const pA = document.getElementById('s03-panel-a');
+  const pB = document.getElementById('s03-panel-b');
+  const conc = document.getElementById('s03-conclusion');
+  const svg = document.getElementById('iceberg-svg');
+  const bot = document.getElementById('iceberg-bottom');
+  if (!iceOff) {
+    iceOff = true;
+    btn.textContent = '✖ Ocultar la base';
+    gsap.to(svg,{y:60,duration:1.2,ease:'power2.inOut'});
+    gsap.to(bot,{opacity:1,y:0,duration:1,ease:'power2.out',delay:0.3});
+    gsap.to(pA,{opacity:0,duration:0.35,onComplete:()=>pA.style.pointerEvents='none'});
+    gsap.to(pB,{opacity:1,duration:0.45,delay:0.3,onComplete:()=>pB.style.pointerEvents='auto'});
+    conc.style.display='block';
+    gsap.fromTo(conc,{opacity:0,y:14},{opacity:1,y:0,duration:0.5,delay:0.9});
+  } else {
+    iceOff = false;
+    btn.textContent = '🔍 Mostrar lo oculto';
+    gsap.to(svg,{y:0,duration:0.8,ease:'power2.inOut'});
+    gsap.to(bot,{opacity:0,y:-30,duration:0.55});
+    gsap.to(pB,{opacity:0,duration:0.28,onComplete:()=>pB.style.pointerEvents='none'});
+    gsap.to(pA,{opacity:1,duration:0.38,delay:0.2,onComplete:()=>pA.style.pointerEvents='auto'});
+    gsap.to(conc,{opacity:0,duration:0.25,onComplete:()=>conc.style.display='none'});
+  }
+}
+
+/* ======= SLIDE 05 — MAPEO CLÍNICO ======= */
+const CD = {
+  ansiedad:{nombre:'Trastorno de Ansiedad',s:{f:['Taquicardia y opresión torácica','Tensión muscular y sudoración'],e:['Rumiación catastrófica y tensión permanente','Miedo a perder el control'],c:['Hiperactividad nerviosa e intentos de controlar lo incontrolable','Evitación de maniobras complejas'],r:['Dependencia excesiva de compañeros','Irritabilidad por hipervigilancia']},p:{2:40,4:30,7:30}},
+  sueno:{nombre:'Trastorno del Sueño (Insomnio)',s:{f:['Fatiga crónica y agotamiento profundo','Alteraciones en la consolidación del sueño'],e:['Irritabilidad e hipersensibilidad al estrés','Frustración al intentar forzar el descanso'],c:['Negligencia procedural (piloto automático)','Microsueños durante guardias'],r:['Aislamiento social por falta de energía','Distancia emocional con la tripulación']},p:{1:50,5:30,7:20}},
+  burnout:{nombre:'Síndrome de Burnout',s:{f:['Agotamiento extremo','Dolores musculoesqueléticos'],e:['Cinismo y despersonalización','Sensación de encierro/atrapamiento'],c:['Presentismo pasivo e inercia','Negligencia procedural'],r:['Insubordinación silenciosa','Desconexión con los pares']},p:{3:40,7:40,10:20}},
+  alimentacion:{nombre:'Trastornos de Alimentación',s:{f:['Alteraciones metabólicas y fluctuaciones de peso','Trastornos gastrointestinales'],e:['Consumo/restricción como control emocional','Frustración y enojo canalizados en la comida'],c:['Atracones compulsivos por encierro','Falta de apetito extrema'],r:['Evitar el comedor común','Esconder comida en el camarote']},p:{2:50,7:30,4:20}},
+  tept:{nombre:'Estrés Postraumático (TEPT)',s:{f:['Hiperactivación autonómica','Sistema de alarma en "lucha o huida"'],e:['Terror, tensión permanente y embotamiento','Disociación'],c:['Evitación de tareas o lugares del barco','Automedicación y reacciones de sobresalto'],r:['Desapego de los demás','Incapacidad para vínculos de confianza']},p:{2:50,10:30,3:20}},
+  depresion:{nombre:'Depresión',s:{f:['Fatiga extrema (astenia)','Dolores sin causa médica aparente'],e:['Sentimientos de inutilidad y desesperanza','Apatía profunda y dolor moral'],c:['Inhibición conductual y lentitud psicomotora','Abandono de tareas preventivas'],r:['Aislamiento social severo','Alejamiento de vínculos familiares']},p:{7:50,2:30,4:20}},
+  ira:{nombre:'Trastorno Explosivo (Ira)',s:{f:['Tensión física extrema y adrenalina','Hipertensión arterial episódica'],e:['Irritabilidad crónica e intolerancia','Hostilidad recurrente'],c:['Arrebatos de furia desproporcionados','Conductas de riesgo por enojo'],r:['Conflictos violentos con la tripulación','Insubordinación grave con mandos']},p:{8:40,9:30,6:30}}
+};
+const qCfg = [{k:'f',l:'💓 Físico',cls:'f'},{k:'e',l:'🧠 Emocional',cls:'e'},{k:'c',l:'🏃 Conductual',cls:'c'},{k:'r',l:'👥 Relacional',cls:'r'}];
+
+function selDiag(key, btn) {
+  document.querySelectorAll('.diag-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const d = CD[key];
+  const panel = document.getElementById('s05-sym-panel');
+  gsap.to(panel,{opacity:0,duration:0.12,onComplete:()=>{
+    let h = `<div class="sym-diag-title">${d.nombre}</div><div class="sym-grid">`;
+    qCfg.forEach(({k,l,cls})=>{
+      h+=`<div class="sym-card ${cls}"><div class="sym-card-title">${l}</div><ul>`;
+      d.s[k].forEach(s=>h+=`<li>${s}</li>`);
+      h+=`</ul></div>`;
+    });
+    h+='</div>';
+    panel.innerHTML=h;
+    gsap.to(panel,{opacity:1,duration:0.18});
+  }});
+  for(let i=1;i<=10;i++){
+    const nd=document.getElementById('nd-'+i),nb=document.getElementById('nb-'+i);
+    nd.classList.remove('active','dimmed');nb.textContent='';
+    gsap.set(nb,{scale:0,opacity:0});
+  }
+  Object.entries(d.p).forEach(([n,pct])=>{
+    const nd=document.getElementById('nd-'+n),nb=document.getElementById('nb-'+n);
+    nd.classList.add('active');nb.textContent=pct+'%';
+    gsap.fromTo(nb,{scale:0,opacity:0},{scale:1,opacity:1,duration:0.3,ease:'back.out(1.7)',delay:0.1});
+  });
+  for(let i=1;i<=10;i++){if(!d.p[i])document.getElementById('nd-'+i).classList.add('dimmed');}
+}
+
+/* ======= SLIDE 06 — DOMINÓ ======= */
+const domData=[
+  {n:1,lbl:'Más Errores',ico:'⚠️',sh:'Piloto automático y negligencia procedural',lg:'La fatiga crónica y el estrés sostenido empujan al tripulante a operar en modo automático, incrementando la probabilidad de omisiones en el monitoreo de equipos y maniobras críticas.'},
+  {n:2,lbl:'Más Accidentes',ico:'🚢',sh:'Siniestros por déficit de alerta',lg:'Los errores humanos derivados de alteraciones del sueño y pérdida de capacidad psicomotriz desembocan inevitablemente en siniestros, colisiones o daños estructurales.'},
+  {n:3,lbl:'Más Rotación',ico:'🔄',sh:'Fuga de talento calificado',lg:'El burnout no atendido y el clima tóxico fuerzan la fuga constante de talentos. La pérdida de capitanes y oficiales implica gastos insostenibles en reclutamiento.'},
+  {n:4,lbl:'Más Licencias',ico:'🏥',sh:'Bajas médicas prolongadas',lg:'La sobrecarga ignorada evoluciona a trastornos de ansiedad y depresión, forzando bajas prolongadas y la necesidad de reemplazos urgentes con salarios duplicados.'},
+  {n:5,lbl:'Más Costos Médicos',ico:'💊',sh:'Hipertensión y somatización crónica',lg:'El estrés crónico genera hipertensión, problemas gástricos y dolores musculoesqueléticos, elevando directamente los gastos de asistencia médica e indemnizaciones.'},
+  {n:6,lbl:'Menor Productividad',ico:'📉',sh:'Presentismo: presente pero ausente',lg:'El trabajador asiste pero su rendimiento es deficiente por apatía y fatiga. Este coste oculto suele superar al del absentismo puro, retrasando operaciones.'},
+  {n:7,lbl:'Menor Compromiso',ico:'💔',sh:'Cinismo y desapego organizacional',lg:'La inacción directiva fomenta injusticia organizacional, destruyendo la motivación. Los tripulantes adoptan cinismo y desapego de los objetivos de seguridad.'},
+  {n:8,lbl:'Más Conflictos',ico:'🔥',sh:'⚑ IMPACTO FINANCIERO TOTAL',lg:'La irritabilidad y el encierro detonan fricciones y estallidos de ira que escalan a huelgas sindicales, paralizando toda la operación de la flota.',final:true}
+];
+
+function buildDomino() {
+  const tr = document.getElementById('s06-tiles');
+  const pr = document.getElementById('s06-panels');
+  if(!tr||!pr) return;
+  tr.innerHTML=''; pr.innerHTML='';
+  domData.forEach((d,i)=>{
+    const wrap=document.createElement('div');wrap.className='dom-wrap';
+    const ico=document.createElement('div');ico.className='dom-ico';ico.textContent=d.ico;
+    const tile=document.createElement('div');tile.className='dom-tile';tile.id='dtile-'+d.n;
+    tile.innerHTML=`<div class="dom-n">${d.n}</div><div class="dom-lbl">${d.lbl}</div>`;
+    if(i===0){tile.title='Clic para iniciar';tile.style.cursor='pointer';tile.onclick=triggerDom;}
+    wrap.appendChild(ico);wrap.appendChild(tile);tr.appendChild(wrap);
+    const panel=document.createElement('div');
+    panel.className='dom-panel'+(d.final?' is-final':'');panel.id='dpanel-'+d.n;
+    panel.innerHTML=`<div class="dp-in"><div class="dp-sh">${d.sh}</div><div class="dp-lg">${d.lg}</div></div>`;
+    pr.appendChild(panel);
+  });
+}
+
+let domGoing=false;
+function triggerDom(){
+  if(domGoing)return; domGoing=true;
+  domData.forEach((_,i)=>{
+    gsap.to('#dtile-'+(i+1),{rotateZ:72,transformOrigin:'bottom center',duration:0.42,delay:i*0.28,ease:'power3.in'});
+    gsap.to('#dpanel-'+(i+1),{height:160,opacity:1,duration:0.38,delay:i*0.28+0.32,ease:'power2.out'});
+  });
+  setTimeout(()=>{
+    const rb=document.getElementById('btn-reset-dom');rb.style.display='inline-block';
+    gsap.from(rb,{opacity:0,y:8,duration:0.35});
+  },(domData.length*0.28+0.9)*1000);
+}
+function resetDom(){
+  gsap.to('.dom-tile',{rotateZ:0,duration:0.45,stagger:{each:0.05,from:'end'},ease:'power2.out'});
+  gsap.to('.dom-panel',{height:0,opacity:0,duration:0.28,stagger:{each:0.04,from:'end'}});
+  document.getElementById('btn-reset-dom').style.display='none';
+  domGoing=false;
+}
+
+/* ======= SLIDE 09 — ÉTICA ======= */
+let ethDone=false;
+function animEthics(){
+  if(ethDone)return;ethDone=true;
+  gsap.from('#slide-09 .slide-title',{opacity:0,y:-18,duration:0.5});
+  gsap.from('#slide-09 .ethics-block',{opacity:0,y:28,stagger:0.25,duration:0.5,delay:0.3});
+}
+
+/* ======= SLIDE 10 — CTA ======= */
+let ctaDone=false;
+function animCTA(){
+  if(ctaDone)return;ctaDone=true;
+  gsap.fromTo('#s10-card',{opacity:0,y:20},{opacity:1,y:0,duration:0.5,ease:'power2.out'});
+  gsap.from('#s10-logo',{scale:0,opacity:0,duration:0.6,delay:0.3,ease:'back.out(1.7)'});
+  gsap.from('.cta-title',{opacity:0,y:14,duration:0.5,delay:0.6});
+  gsap.from('.cta-sep',{scaleX:0,duration:0.4,delay:0.95});
+  gsap.from('.cta-link',{opacity:0,y:12,stagger:0.2,duration:0.4,delay:1.1});
+}
+</script>
+</body>
+</html>
